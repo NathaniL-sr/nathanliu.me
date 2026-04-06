@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@200;300;400;500&family=JetBrains+Mono:wght@200;300;400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root {
+        :root{
             --bg:#FDFCF8;--fg:#1C1917;--muted:#78716c;--light:#a8a29e;--lighter:#d6d3d1;
             --red:#dc2626;--border:rgba(28,25,23,0.1);
             --display:'Cormorant Garamond',Georgia,serif;
@@ -18,350 +18,366 @@
         }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         ::selection{background:#e7e5e4;color:var(--fg)}
-        html{font-size:16px}
+        html{font-size:16px;scroll-behavior:smooth}
         body{font-family:var(--body);font-weight:300;color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
         .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-size:40px 40px;background-image:linear-gradient(to right,rgba(28,25,23,0.025) 1px,transparent 1px),linear-gradient(to bottom,rgba(28,25,23,0.025) 1px,transparent 1px);mask-image:linear-gradient(to bottom,black 25%,transparent 60%);-webkit-mask-image:linear-gradient(to bottom,black 25%,transparent 60%)}
 
-        #three-container{position:fixed;top:0;right:0;width:50vw;height:100vh;z-index:0;cursor:pointer;transition:opacity .4s}
-        @media(max-width:900px){#three-container{width:100vw;height:40vh;top:auto;bottom:0}}
+        #three-container{position:fixed;top:0;right:0;width:66vw;height:100vh;z-index:0;cursor:pointer;transition:opacity .5s;opacity:0.55}
 
-        /* ── Orb click hint ── */
-        .orb-hint{
-            position:fixed;z-index:15;pointer-events:none;
-            right:25vw;top:50%;transform:translate(50%,60px);
-            display:flex;flex-direction:column;align-items:center;gap:.5rem;
-            transition:opacity .5s,transform .5s;
-        }
-        .orb-hint.gone{opacity:0;transform:translate(50%,60px) scale(0.9);pointer-events:none}
+        .arrow-hint{position:fixed;z-index:15;pointer-events:none;left:34vw;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:0;transition:opacity .6s,transform .6s}
+        .arrow-hint.gone{opacity:0;transform:translateY(-50%) translateX(20px)}
+        @keyframes arrowNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+        .arrow-label{display:flex;flex-direction:column;align-items:flex-end;margin-right:.6rem}
+        .arrow-label-main{font-family:var(--display);font-style:italic;font-size:.95rem;color:var(--muted);white-space:nowrap}
+        .arrow-label-sub{font-family:var(--mono);font-size:.45rem;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-top:.15rem}
+        .arrow-svg{animation:arrowNudge 2s ease-in-out infinite;flex-shrink:0}
 
-        @keyframes hintFloat{
-            0%,100%{transform:translateY(0)}
-            50%{transform:translateY(-6px)}
-        }
-        @keyframes hintPing{
-            0%{transform:translate(-50%,-50%) scale(1);opacity:.5}
-            100%{transform:translate(-50%,-50%) scale(2.2);opacity:0}
-        }
-        @keyframes cursorBounce{
-            0%,100%{transform:translateY(0)}
-            40%{transform:translateY(-3px)}
-            60%{transform:translateY(1px)}
-        }
-
-        .hint-pill{
-            display:flex;align-items:center;gap:.45rem;
-            background:var(--fg);color:var(--bg);
-            padding:.4rem .9rem .4rem .7rem;border-radius:999px;
-            font-family:var(--body);font-size:.72rem;font-weight:400;letter-spacing:.01em;
-            animation:hintFloat 3s ease-in-out infinite;
-            box-shadow:0 4px 20px rgba(220,38,38,0.15);
-        }
-        .hint-pill svg{animation:cursorBounce 1.5s ease-in-out infinite}
-
-        .hint-ping{
-            width:48px;height:48px;position:absolute;top:-56px;left:50%;
-            transform:translate(-50%,-50%);pointer-events:none;
-        }
-        .hint-ping::before,.hint-ping::after{
-            content:'';position:absolute;top:50%;left:50%;
-            width:48px;height:48px;border-radius:50%;
-            border:1.5px solid var(--red);
-            transform:translate(-50%,-50%) scale(1);
-            animation:hintPing 2.5s ease-out infinite;
-        }
-        .hint-ping::after{animation-delay:1.25s}
-
-        .hint-sub{
-            font-family:var(--mono);font-size:.45rem;text-transform:uppercase;
-            letter-spacing:.15em;color:var(--light);
-        }
-
-        @media(max-width:900px){
-            .orb-hint{right:50%;top:auto;bottom:22vh;transform:translate(50%,0)}
-            .orb-hint.gone{transform:translate(50%,0) scale(0.9)}
-        }
-
-        /* ── Chat overlay ── */
-        .chat-overlay{
-            position:fixed;top:0;right:0;width:50vw;height:100vh;z-index:20;
-            display:none;flex-direction:column;pointer-events:none;
-        }
+        .chat-overlay{position:fixed;top:0;right:0;width:66vw;height:100vh;z-index:20;display:none;flex-direction:column;pointer-events:none}
         .chat-overlay.open{display:flex}
-        @media(max-width:900px){.chat-overlay{width:100vw;height:40vh;top:auto;bottom:0}}
-
-        .chat-messages{
-            flex:1;overflow-y:auto;padding:5rem 2rem 1rem;
-            display:flex;flex-direction:column;gap:.6rem;pointer-events:auto;
-            mask-image:linear-gradient(to bottom,transparent 0%,black 8%,black 88%,transparent 100%);
-            -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 8%,black 88%,transparent 100%);
-        }
-        .chat-msg{font-size:.78rem;line-height:1.6;max-width:80%}
-        .chat-msg.user{align-self:flex-end;background:var(--fg);color:var(--bg);padding:.45rem .8rem;border-radius:14px 14px 3px 14px}
-        .chat-msg.ai{align-self:flex-start;color:var(--fg);padding:.45rem .5rem;background:rgba(253,252,248,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:3px 14px 14px 14px;border:1px solid rgba(28,25,23,0.06)}
-        .chat-msg.ai .thinking{color:var(--light);font-style:italic}
-
-        .chat-input-row{padding:1rem 2rem 2rem;display:flex;gap:.5rem;pointer-events:auto}
-        .chat-input{flex:1;font-family:var(--body);font-size:.8rem;font-weight:300;padding:.6rem .8rem;border:1px solid rgba(28,25,23,0.12);border-radius:6px;background:rgba(253,252,248,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--fg);outline:none;transition:border-color .15s}
+        .chat-messages{flex:1;overflow-y:auto;padding:4rem 2.5rem 1rem;display:flex;flex-direction:column;gap:.6rem;pointer-events:auto;mask-image:linear-gradient(to bottom,transparent 0%,black 6%,black 90%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 6%,black 90%,transparent 100%)}
+        .chat-msg{font-size:.8rem;line-height:1.65;max-width:75%}
+        .chat-msg.user{align-self:flex-end;background:var(--fg);color:var(--bg);padding:.5rem .85rem;border-radius:14px 14px 3px 14px}
+        .chat-msg.ai{align-self:flex-start;color:var(--fg);padding:.5rem .6rem;background:rgba(253,252,248,0.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:3px 14px 14px 14px;border:1px solid rgba(28,25,23,0.06)}
+        .chat-msg .thinking{color:var(--light);font-style:italic}
+        .chat-input-row{padding:1rem 2.5rem 2.5rem;display:flex;gap:.5rem;pointer-events:auto}
+        .chat-input{flex:1;font-family:var(--body);font-size:.82rem;font-weight:300;padding:.65rem .9rem;border:1px solid rgba(28,25,23,0.12);border-radius:8px;background:rgba(253,252,248,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--fg);outline:none;transition:border-color .15s}
         .chat-input:focus{border-color:var(--red)}
         .chat-input::placeholder{color:var(--light)}
-        .chat-send{background:var(--fg);color:var(--bg);border:none;cursor:pointer;padding:.5rem .8rem;border-radius:6px;font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;transition:background .12s;white-space:nowrap}
+        .chat-send{background:var(--fg);color:var(--bg);border:none;cursor:pointer;padding:.55rem .9rem;border-radius:8px;font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;transition:background .12s;white-space:nowrap}
         .chat-send:hover{background:#44403c}
         .chat-send:disabled{opacity:.4;cursor:default}
-
-        .chat-close-btn{position:absolute;top:1rem;right:1.5rem;z-index:25;background:rgba(253,252,248,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(28,25,23,0.08);border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .12s,background .12s;pointer-events:auto}
+        .chat-close-btn{position:absolute;top:1.25rem;right:1.75rem;z-index:25;background:rgba(253,252,248,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(28,25,23,0.08);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .12s,background .12s;pointer-events:auto}
         .chat-close-btn:hover{color:var(--fg);background:rgba(253,252,248,0.95)}
-
         .chat-limit{font-family:var(--mono);font-size:.5rem;color:var(--light);letter-spacing:.05em;text-align:center;padding:0 2rem .5rem;pointer-events:auto}
 
-        /* ── Animations ── */
         @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
         .f{animation:fadeUp 1s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
         .d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}.d4{animation-delay:.48s}.d5{animation-delay:.62s}
 
-        /* ── Page ── */
-        .page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:700px;padding:5rem 2rem 3rem}
-
-        .hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-        .hdr-name{font-family:var(--display);font-size:1.6rem;font-weight:400;letter-spacing:-0.02em}
+        .page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:520px;width:34vw;padding:4rem 2rem 3rem}
+        .hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+        .hdr-name{font-family:var(--display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em}
         .hdr-name em{font-style:italic;color:var(--red)}
-        .hdr-links{display:flex;gap:1.1rem;align-items:center}
-        .hdr-links a{font-family:var(--mono);font-size:.6rem;font-weight:300;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-decoration:none;transition:color .15s}
+        .hdr-links{display:flex;gap:1rem;align-items:center}
+        .hdr-links a{font-family:var(--mono);font-size:.55rem;font-weight:300;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-decoration:none;transition:color .15s}
         .hdr-links a:hover{color:var(--fg)}
-        @media(max-width:520px){.hdr{flex-direction:column;gap:.75rem}.hdr-links{flex-wrap:wrap}}
-
-        .tag{font-family:var(--display);font-size:clamp(1.6rem,3.8vw,2.5rem);font-weight:300;line-height:1.2;letter-spacing:-0.02em;margin-bottom:2.25rem;max-width:540px}
+        .tag{font-family:var(--display);font-size:clamp(1.4rem,2.5vw,2.2rem);font-weight:300;line-height:1.2;letter-spacing:-0.02em;margin-bottom:1.75rem}
         .tag em{font-style:italic;color:var(--red);font-weight:400}
-
-        .school{font-family:var(--mono);font-size:.6rem;font-weight:300;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-bottom:2rem;display:flex;align-items:center;gap:.6rem}
-        .school::before{content:'';width:20px;height:1px;background:var(--red)}
-
-        .creds{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem 1.75rem;margin-bottom:2.25rem}
-        @media(max-width:640px){.creds{grid-template-columns:1fr 1fr}}
-        .cl{font-family:var(--mono);font-size:.5625rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.5rem}
+        .school{font-family:var(--mono);font-size:.55rem;font-weight:300;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-bottom:1.75rem;display:flex;align-items:center;gap:.6rem}
+        .school::before{content:'';width:18px;height:1px;background:var(--red)}
+        .creds{display:grid;grid-template-columns:1fr;gap:1.1rem;margin-bottom:1.75rem}
+        .cl{font-family:var(--mono);font-size:.5rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.4rem}
         .clist{list-style:none}
-        .clist li{font-size:.78rem;font-weight:400;line-height:1.3;margin-bottom:.3rem}
+        .clist li{font-size:.72rem;font-weight:400;line-height:1.3;margin-bottom:.25rem}
         .clist li a{color:var(--fg);text-decoration:none;transition:color .12s}
         .clist li a:hover{color:var(--red)}
-        .clist .r{font-size:.65rem;font-weight:300;color:var(--light)}
-
-        .wh{font-family:var(--mono);font-size:.5625rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.6rem}
-        .wt{width:100%;border-collapse:collapse;margin-bottom:2.25rem}
+        .clist .r{font-size:.6rem;font-weight:300;color:var(--light)}
+        .wh{font-family:var(--mono);font-size:.5rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.5rem}
+        .wt{width:100%;border-collapse:collapse;margin-bottom:1.75rem}
         .wt tr{border-bottom:1px solid var(--border);transition:background .12s}
         .wt tr:first-child{border-top:1px solid var(--border)}
         .wt tr:hover{background:rgba(220,38,38,.035)}
-        .wt td{padding:.65rem 0;vertical-align:top}
-        .wo{font-family:var(--mono);font-size:.6rem;font-weight:400;text-transform:uppercase;letter-spacing:.06em;color:var(--red);width:105px;padding-right:.75rem;white-space:nowrap;padding-top:.68rem}
-        .wr{font-size:.78rem;font-weight:400;color:var(--fg);line-height:1.6}
-        .wr .bg{font-size:.68rem;font-weight:300;color:var(--light);display:block;margin-bottom:.2rem}
-
-        .ft{display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.6rem}
-        .ft-links{display:flex;gap:.75rem}
-        .ft-links a{font-size:.7rem;font-weight:400;color:var(--fg);text-decoration:none;padding:.25rem .75rem;border:1px solid var(--border);border-radius:999px;transition:all .12s;display:inline-flex;align-items:center;gap:.35rem}
+        .wt td{padding:.55rem 0;vertical-align:top}
+        .wo{font-family:var(--mono);font-size:.55rem;font-weight:400;text-transform:uppercase;letter-spacing:.06em;color:var(--red);width:90px;padding-right:.6rem;white-space:nowrap;padding-top:.58rem}
+        .wr{font-size:.72rem;font-weight:400;color:var(--fg);line-height:1.6}
+        .wr .bg{font-size:.62rem;font-weight:300;color:var(--light);display:block;margin-bottom:.15rem}
+        .ft{display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.5rem}
+        .ft-links{display:flex;gap:.6rem}
+        .ft-links a{font-size:.65rem;font-weight:400;color:var(--fg);text-decoration:none;padding:.2rem .65rem;border:1px solid var(--border);border-radius:999px;transition:all .12s;display:inline-flex;align-items:center;gap:.3rem}
         .ft-links a:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-        .ft-links a svg{width:11px;height:11px}
-        .ft-r{display:flex;align-items:center;gap:.35rem}
+        .ft-links a svg{width:10px;height:10px}
+        .ft-r{display:flex;align-items:center;gap:.3rem}
         .pdot{width:5px;height:5px;border-radius:50%;background:#16a34a;animation:pulse 3s ease-in-out infinite}
-        .ft-s{font-family:var(--mono);font-size:.5rem;font-weight:300;color:var(--light);letter-spacing:.05em}
+        .ft-s{font-family:var(--mono);font-size:.45rem;font-weight:300;color:var(--light);letter-spacing:.05em}
+
+        @media(max-width:900px){
+            body{display:flex;flex-direction:column}
+            #three-container{position:sticky;top:0;left:0;width:100vw;height:45vh;opacity:0.75 !important;z-index:2;flex-shrink:0;cursor:pointer}
+            .arrow-hint{display:none !important}
+            .mobile-hint{display:flex !important}
+            .chat-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(253,252,248,0.94);z-index:50}
+            .chat-messages{padding:3.5rem 1.25rem 1rem}
+            .chat-input-row{padding:.75rem 1.25rem 1.5rem}
+            .chat-close-btn{top:1rem;right:1rem}
+            .page{width:100%;max-width:100%;min-height:auto;padding:2rem 1.5rem 2.5rem;background:var(--bg);position:relative;z-index:3}
+            .hdr{flex-direction:column;gap:.6rem}
+            .hdr-links{flex-wrap:wrap;gap:.8rem}
+            .tag{font-size:1.5rem;margin-bottom:1.25rem}
+            .creds{grid-template-columns:1fr 1fr;gap:1rem}
+            .wt .wo{width:70px;font-size:.5rem}
+            .wt .wr{font-size:.68rem}
+            .wt .wr .bg{font-size:.56rem}
+            .ft{flex-direction:column;align-items:flex-start;gap:.6rem}
+        }
+        .mobile-hint{display:none;position:absolute;z-index:16;left:50%;bottom:1.25rem;transform:translateX(-50%);align-items:center;gap:.5rem;pointer-events:none;transition:opacity .4s}
+        .mobile-hint.gone{opacity:0}
+        .mobile-hint-text{font-family:var(--display);font-style:italic;font-size:.85rem;color:var(--muted);white-space:nowrap}
+        .mobile-hint-sub{font-family:var(--mono);font-size:.42rem;text-transform:uppercase;letter-spacing:.1em;color:var(--light)}
+        @keyframes mNudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+        .mobile-hint svg{animation:mNudge 2s ease-in-out infinite}
     </style>
 </head>
 <body>
 
 <div class="grid-bg"></div>
-<div id="three-container"></div>
 
-<!-- Orb click hint -->
-<div class="orb-hint" id="orb-hint">
-    <div class="hint-ping"></div>
-    <div class="hint-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Click me to chat!
+<div class="orb-wrapper" style="position:relative;flex-shrink:0">
+    <div id="three-container"></div>
+    <div class="mobile-hint" id="mobile-hint">
+        <div><div class="mobile-hint-text">Tap to chat with me</div><div class="mobile-hint-sub">AI-powered · Knows Nathan's work</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" stroke-width="1.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
     </div>
-    <div class="hint-sub">AI that knows Nathan</div>
 </div>
 
-<!-- Chat overlay -->
+<div class="arrow-hint" id="arrow-hint">
+    <div class="arrow-label"><div class="arrow-label-main">Click to chat with me</div><div class="arrow-label-sub">AI-powered · Knows Nathan's work</div></div>
+    <svg class="arrow-svg" width="48" height="32" viewBox="0 0 48 32" fill="none"><path d="M0 16 C12 16, 20 6, 32 6 C38 6, 42 10, 46 16" stroke="#a8a29e" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M40 12 L46 16 L40 20" stroke="#a8a29e" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+
 <div class="chat-overlay" id="chat-overlay">
-    <button class="chat-close-btn" id="chat-close">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="chat-messages" id="chat-messages">
-        <div class="chat-msg ai">Hi — I'm Nathan's AI. Ask me about his research, startups, or experience.</div>
-    </div>
+    <button class="chat-close-btn" id="chat-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="chat-messages" id="chat-messages"><div class="chat-msg ai">Hi — I'm Nathan's AI. Ask me about his research, startups, or experience.</div></div>
     <div class="chat-limit" id="chat-limit"></div>
-    <div class="chat-input-row">
-        <input type="text" class="chat-input" id="chat-input" placeholder="e.g. What is EntroPINN?" autocomplete="off">
-        <button class="chat-send" id="chat-send">Send</button>
-    </div>
+    <div class="chat-input-row"><input type="text" class="chat-input" id="chat-input" placeholder="e.g. What is EntroPINN?" autocomplete="off"><button class="chat-send" id="chat-send">Send</button></div>
 </div>
 
 <div class="page">
-
-    <div class="hdr f d1">
-        <div class="hdr-name">Nathan <em>Liu</em></div>
-        <div class="hdr-links">
-            <a href="mailto:NathanL2132@berkeley.edu">Email</a>
-            <a href="https://www.linkedin.com/in/nathan-sr-liu" target="_blank">LinkedIn</a>
-            <a href="https://github.com/nathanliu" target="_blank">GitHub</a>
-            <a href="NL_Professional_Resume.pdf" target="_blank">Résumé</a>
-        </div>
-    </div>
-
-    <div class="tag f d2">
-        Engineer, researcher, founder.<br>
-        AI for physical systems &amp; <em>scientific discovery.</em>
-    </div>
-
+    <div class="hdr f d1"><div class="hdr-name">Nathan <em>Liu</em></div><div class="hdr-links"><a href="mailto:NathanL2132@berkeley.edu">Email</a><a href="https://www.linkedin.com/in/nathan-sr-liu" target="_blank">LinkedIn</a><a href="https://github.com/nathanliu" target="_blank">GitHub</a><a href="NL_Professional_Resume.pdf" target="_blank">Résumé</a></div></div>
+    <div class="tag f d2">Engineer, researcher, founder.<br>AI for physical systems &amp; <em>scientific discovery.</em></div>
     <div class="school f d2">UC Berkeley · Chemical Engineering &amp; Computer Science · Class of 2027</div>
-
     <div class="creds f d3">
-        <div>
-            <div class="cl">Research</div>
-            <ul class="clist">
-                <li><a href="#">Peidong Yang Group</a> <span class="r">· ML-driven CO₂ electrochemical reduction</span></li>
-                <li><a href="#">Ali Mesbah Lab</a> <span class="r">· Stochastic optimization &amp; learning-based control</span></li>
-                <li><a href="#">The Kavli Foundation</a> <span class="r">· ENSI Fellow</span></li>
-                <li><a href="#">Bakar BioEnginuity Labs</a></li>
-            </ul>
-        </div>
-        <div>
-            <div class="cl">Ventures</div>
-            <ul class="clist">
-                <li><a href="https://www.entropinn.com" target="_blank">EntroPINN</a> <span class="r">· Co-founder</span></li>
-                <li><a href="#">Free Ventures</a></li>
-                <li><a href="#">AIEB</a> <span class="r">· AI Entrepreneurs at Berkeley</span></li>
-            </ul>
-        </div>
-        <div>
-            <div class="cl">Leadership</div>
-            <ul class="clist">
-                <li><a href="#">UC Berkeley Tau Beta Pi</a> <span class="r">· Vice President, National Engineering Honor Society (California-Alpha Chapter, 1907)</span></li>
-                <li><a href="#">UN Millennium Fellowship</a> <span class="r">· UC Berkeley Campus Director</span></li>
-            </ul>
-        </div>
+        <div><div class="cl">Research</div><ul class="clist"><li><a href="#">Peidong Yang Group</a> <span class="r">· ML-driven CO₂ electrochemical reduction</span></li><li><a href="#">Ali Mesbah Lab</a> <span class="r">· Stochastic optimization &amp; learning-based control</span></li><li><a href="#">The Kavli Foundation</a> <span class="r">· ENSI Fellow</span></li><li><a href="#">Bakar BioEnginuity Labs</a></li></ul></div>
+        <div><div class="cl">Ventures</div><ul class="clist"><li><a href="https://www.entropinn.com" target="_blank">EntroPINN</a> <span class="r">· Co-founder</span></li><li><a href="#">Free Ventures</a></li><li><a href="#">AIEB</a> <span class="r">· AI Entrepreneurs at Berkeley</span></li></ul></div>
+        <div><div class="cl">Leadership</div><ul class="clist"><li><a href="#">UC Berkeley Tau Beta Pi</a> <span class="r">· Vice President, National Engineering Honor Society (California-Alpha Chapter, 1907)</span></li><li><a href="#">UN Millennium Fellowship</a> <span class="r">· UC Berkeley Campus Director</span></li></ul></div>
     </div>
-
     <div class="f d4">
         <div class="wh">Selected Work</div>
         <table class="wt">
-            <tr>
-                <td class="wo">EntroPINN</td>
-                <td class="wr">
-                    <span class="bg">VC-backed startup building physics-informed neural networks for industrial process optimization.</span>
-                    Developed scalable PINN-based heat transfer optimization frameworks for industrial processes, partnering with AI teams at AVEVA, Siemens, and others targeting the industrial digital twin market. Enabling rapid design iteration and high-fidelity process simulation with 70+ process engineers interviewed.
-                </td>
-            </tr>
-            <tr>
-                <td class="wo">Paradromics</td>
-                <td class="wr">
-                    <span class="bg">Preclinical neurotechnology company developing high-bandwidth intracortical brain-computer interfaces.</span>
-                    Built neural decoding algorithms for auditory cortex recordings on the Connexus BCI, achieving 200+ bps low-latency data transfer rate benchmarked at 20×+ the reported throughput of existing intracortical systems. Designed and tested smart-device control in 15+ successful lab experiments validating real-time BCI interaction.
-                </td>
-            </tr>
-            <tr>
-                <td class="wo">Peidong Yang Group</td>
-                <td class="wr">
-                    <span class="bg">Lawrence Berkeley National Laboratory. Funded by The Kavli Foundation, Bakar Labs, Berkeley Discovery Hub.</span>
-                    ML-driven discovery and optimization of next-generation catalysts for CO₂ electrochemical reduction. Conduct H-cell electrolysis, electrochemical impedance spectroscopy, in situ Raman spectroscopy, TEM imaging, and SECCM. Upcoming JACS publication on Cu nanograin vibrational spectroscopy.
-                </td>
-            </tr>
-            <tr>
-                <td class="wo">Industry Co-op</td>
-                <td class="wr">
-                    <span class="bg">Company specializing in R&amp;D and industrialization of engine exhaust after-treatment products.</span>
-                    Co-developed ML-empowered multiparametric emission monitoring system for commercial diesel fleets, tracking engine torque, fuel consumption, NOx, particulate matter, and 30+ parameters to predict emissions. Deployed across 16,200+ vehicles worldwide, reducing nitrogen oxide emissions by 14% (&gt;2,100 tons).
-                </td>
-            </tr>
-            <tr>
-                <td class="wo">UN Millennium Fellowship</td>
-                <td class="wr">
-                    <span class="bg">Civic leadership program presented by the United Nations Academic Impact and Millennium Campus Network.</span>
-                    Led 4 projects with 50+ volunteers from 6 countries to complete 750+ service hours, benefiting 500+ underprivileged families. Initiated collaborations with city governments and NGOs on social projects. Engaged in policy webinars with UN and Gates Foundation leadership.
-                </td>
-            </tr>
+            <tr><td class="wo">EntroPINN</td><td class="wr"><span class="bg">VC-backed startup building physics-informed neural networks for industrial process optimization.</span>Developed scalable PINN-based heat transfer optimization frameworks for industrial processes, partnering with AI teams at AVEVA, Siemens, and others targeting the industrial digital twin market. Enabling rapid design iteration and high-fidelity process simulation with 70+ process engineers interviewed.</td></tr>
+            <tr><td class="wo">Paradromics</td><td class="wr"><span class="bg">Preclinical neurotechnology company developing high-bandwidth intracortical brain-computer interfaces.</span>Built neural decoding algorithms for auditory cortex recordings on the Connexus BCI, achieving 200+ bps low-latency data transfer rate benchmarked at 20×+ the reported throughput of existing intracortical systems. Designed and tested smart-device control in 15+ successful lab experiments validating real-time BCI interaction.</td></tr>
+            <tr><td class="wo">Peidong Yang Group</td><td class="wr"><span class="bg">Lawrence Berkeley National Laboratory. Funded by The Kavli Foundation, Bakar Labs, Berkeley Discovery Hub.</span>ML-driven discovery and optimization of next-generation catalysts for CO₂ electrochemical reduction. Conduct H-cell electrolysis, electrochemical impedance spectroscopy, in situ Raman spectroscopy, TEM imaging, and SECCM. Upcoming JACS publication on Cu nanograin vibrational spectroscopy.</td></tr>
+            <tr><td class="wo">Industry Co-op</td><td class="wr"><span class="bg">Company specializing in R&amp;D and industrialization of engine exhaust after-treatment products.</span>Co-developed ML-empowered multiparametric emission monitoring system for commercial diesel fleets, tracking engine torque, fuel consumption, NOx, particulate matter, and 30+ parameters to predict emissions. Deployed across 16,200+ vehicles worldwide, reducing nitrogen oxide emissions by 14% (&gt;2,100 tons).</td></tr>
+            <tr><td class="wo">UN Millennium Fellowship</td><td class="wr"><span class="bg">Civic leadership program presented by the United Nations Academic Impact and Millennium Campus Network.</span>Led 4 projects with 50+ volunteers from 6 countries to complete 750+ service hours, benefiting 500+ underprivileged families. Initiated collaborations with city governments and NGOs on social projects. Engaged in policy webinars with UN and Gates Foundation leadership.</td></tr>
         </table>
     </div>
-
     <div class="ft f d5">
-        <div class="ft-links">
-            <a href="mailto:NathanL2132@berkeley.edu">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                Email
-            </a>
-            <a href="https://www.linkedin.com/in/nathan-sr-liu" target="_blank">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                LinkedIn
-            </a>
-            <a href="NL_Professional_Resume.pdf" target="_blank">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                Résumé
-            </a>
-        </div>
-        <div class="ft-r">
-            <div class="pdot"></div>
-            <div class="ft-s">Berkeley, CA · Open to collaborate</div>
-        </div>
+        <div class="ft-links"><a href="mailto:NathanL2132@berkeley.edu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Email</a><a href="https://www.linkedin.com/in/nathan-sr-liu" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a><a href="NL_Professional_Resume.pdf" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Résumé</a></div>
+        <div class="ft-r"><div class="pdot"></div><div class="ft-s">Berkeley, CA · Open to collaborate</div></div>
     </div>
-
 </div>
 
 <script>
-var aiThinking=false,chatOpen=false,baseDistortion=0.6;
+// ═══════════ REACTIVITY STATE ═══════════
+// States: idle (1.4) -> spike (3.5, instant on send) -> thinking (oscillates 1.4–2.9) -> settle (back to 1.4)
+var orbState = 'idle';    // idle | spike | thinking | settle
+var spikeTime = 0;        // when the spike started
+var baseDistortion = 1.4;
+var targetDistortion = 1.4;
+var currentDistortion = 1.4;
+var chatOpen = false;
+
+function triggerSpike() {
+    orbState = 'spike';
+    spikeTime = performance.now();
+    targetDistortion = 3.8;
+}
+function startThinking() { orbState = 'thinking'; }
+function stopThinking() { orbState = 'settle'; targetDistortion = baseDistortion; }
+
+function isMobile() { return window.innerWidth <= 900; }
 
 // ═══════════ THREE.JS ═══════════
 (function(){
-    var c=document.getElementById('three-container');if(!c)return;
-    var vs=`uniform float uTime;uniform float uDistortion;uniform float uSize;uniform vec2 uMouse;varying float vNoise;varying vec3 vPos;
-vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
-float snoise(vec3 v){const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0.,.5,1.,2.);vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.-g;vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+2.*C.xxx;vec3 x3=x0-1.+3.*C.xxx;i=mod289(i);vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));float n_=1./7.;vec3 ns=n_*D.wyz-D.xzx;vec4 j=p-49.*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.*x_);vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.-abs(x)-abs(y);vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);vec4 s0=floor(b0)*2.+1.;vec4 s1=floor(b1)*2.+1.;vec4 sh=-step(h,vec4(0.));vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m=m*m;return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));}
-void main(){vec3 pos=position;float noise=snoise(vec3(pos.x*.5+uTime*.1,pos.y*.5,pos.z*.5));vNoise=noise;vec3 newPos=pos+(normalize(pos)*noise*uDistortion);float dist=distance(uMouse*10.,newPos.xy);float interaction=smoothstep(5.,0.,dist);newPos+=normalize(pos)*interaction*.5;vec4 mvPosition=modelViewMatrix*vec4(newPos,1.);gl_Position=projectionMatrix*mvPosition;gl_PointSize=uSize*(24./-mvPosition.z)*(1.+noise*.5);vPos=newPos;}`;
-    var fs=`uniform vec3 uColor;uniform float uOpacity;varying float vNoise;varying vec3 vPos;
-void main(){vec2 center=gl_PointCoord-vec2(.5);float dist=length(center);if(dist>.5)discard;float alpha=smoothstep(.5,.2,dist)*uOpacity;vec3 darkColor=uColor*.5;vec3 lightColor=uColor*1.8;vec3 finalColor=mix(darkColor,lightColor,vNoise*.5+.5);gl_FragColor=vec4(finalColor,alpha);}`;
+    var c = document.getElementById('three-container'); if (!c) return;
 
-    var scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0xfdfcf8,0.035);
-    var cam=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,100);cam.position.set(0,0,18);
-    var ren=new THREE.WebGLRenderer({antialias:true,alpha:true});ren.setSize(c.clientWidth,c.clientHeight);ren.setPixelRatio(Math.min(window.devicePixelRatio,2));c.appendChild(ren.domElement);
-    var grp=new THREE.Group();scene.add(grp);
-    var geo=new THREE.IcosahedronGeometry(4.5,30);
-    var uni={uTime:{value:0},uDistortion:{value:0.6},uSize:{value:3.5},uColor:{value:new THREE.Color('#dc2626')},uOpacity:{value:0.8},uMouse:{value:new THREE.Vector2(0,0)}};
-    var mat=new THREE.ShaderMaterial({vertexShader:vs,fragmentShader:fs,uniforms:uni,transparent:true,depthWrite:false,blending:THREE.NormalBlending});
-    grp.add(new THREE.Points(geo,mat));
-    var lg=new THREE.Group();grp.add(lg);
-    function co(r,rx,ry){var cv=new THREE.EllipseCurve(0,0,r,r,0,2*Math.PI,false,0);var g2=new THREE.BufferGeometry().setFromPoints(cv.getPoints(128));var m2=new THREE.LineBasicMaterial({color:0xdc2626,transparent:true,opacity:0.25});var o=new THREE.Line(g2,m2);o.rotation.x=rx;o.rotation.y=ry;lg.add(o);return o;}
-    var orbs=[co(5.5,Math.PI/2,0),co(5.2,Math.PI/3,Math.PI/6),co(6,Math.PI/1.8,Math.PI/4)];
-    function adj(){if(window.innerWidth<900){grp.position.set(0,0,-6);grp.scale.set(.5,.5,.5)}else{grp.position.set(2,0,-2);grp.scale.set(.85,.85,.85)}}adj();
-    var mx=0,my=0;document.addEventListener('mousemove',function(e){mx=(e.clientX/window.innerWidth)*2-1;my=-(e.clientY/window.innerHeight)*2+1;uni.uMouse.value.x+=(mx-uni.uMouse.value.x)*.05;uni.uMouse.value.y+=(my-uni.uMouse.value.y)*.05});
-    window.addEventListener('resize',function(){cam.aspect=c.clientWidth/c.clientHeight;cam.updateProjectionMatrix();ren.setSize(c.clientWidth,c.clientHeight);adj()});
+    var vs = `
+uniform float uTime;
+uniform float uDistortion;
+uniform float uSize;
+uniform vec2 uMouse;
+varying float vNoise;
+varying vec3 vPos;
 
-    var t=0;
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
+vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
+
+float snoise(vec3 v){
+  const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0.,.5,1.,2.);
+  vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.-g;
+  vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+2.*C.xxx;vec3 x3=x0-1.+3.*C.xxx;
+  i=mod289(i);
+  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
+  float n_=1./7.;vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.*floor(p*ns.z*ns.z);
+  vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.*x_);
+  vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;
+  vec4 h=1.-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.+1.;vec4 s1=floor(b1)*2.+1.;
+  vec4 sh=-step(h,vec4(0.));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);
+  m=m*m;
+  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}
+
+void main(){
+  vec3 pos = position;
+  float n1 = snoise(vec3(pos.x*0.3 + uTime*0.25, pos.y*0.3 + uTime*0.15, pos.z*0.3));
+  float n2 = snoise(vec3(pos.y*0.2 - uTime*0.12, pos.z*0.2 + uTime*0.18, pos.x*0.2));
+  float noise = n1 * 0.65 + n2 * 0.35;
+  vNoise = noise;
+  vec3 dir = normalize(pos);
+  vec3 newPos = pos + dir * noise * uDistortion;
+  float breath = sin(uTime * 0.4) * 0.15 + 1.0;
+  newPos *= breath;
+  float dist = distance(uMouse * 10.0, newPos.xy);
+  float interaction = smoothstep(5.0, 0.0, dist);
+  newPos += dir * interaction * 0.6;
+  vec4 mvPosition = modelViewMatrix * vec4(newPos, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  gl_PointSize = uSize * (24.0 / -mvPosition.z) * (1.0 + noise * 0.4);
+  vPos = newPos;
+}`;
+
+    var fs = `
+uniform vec3 uColor;
+uniform float uOpacity;
+varying float vNoise;
+varying vec3 vPos;
+void main(){
+  vec2 center = gl_PointCoord - vec2(0.5);
+  float dist = length(center);
+  if(dist > 0.5) discard;
+  float alpha = smoothstep(0.5, 0.15, dist) * uOpacity;
+  vec3 darkColor = uColor * 0.4;
+  vec3 lightColor = uColor * 1.9;
+  vec3 finalColor = mix(darkColor, lightColor, vNoise * 0.5 + 0.5);
+  gl_FragColor = vec4(finalColor, alpha);
+}`;
+
+    var scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0xfdfcf8, 0.03);
+    var cam = new THREE.PerspectiveCamera(50, c.clientWidth/c.clientHeight, 0.1, 100); cam.position.set(0,0,18);
+    var ren = new THREE.WebGLRenderer({antialias:true, alpha:true}); ren.setSize(c.clientWidth, c.clientHeight); ren.setPixelRatio(Math.min(window.devicePixelRatio,2)); c.appendChild(ren.domElement);
+    var grp = new THREE.Group(); scene.add(grp);
+    var geo = new THREE.IcosahedronGeometry(4.5, 30);
+    var uni = {uTime:{value:0}, uDistortion:{value:1.4}, uSize:{value:3.0}, uColor:{value:new THREE.Color('#dc2626')}, uOpacity:{value:0.75}, uMouse:{value:new THREE.Vector2(0,0)}};
+    var mat = new THREE.ShaderMaterial({vertexShader:vs, fragmentShader:fs, uniforms:uni, transparent:true, depthWrite:false, blending:THREE.NormalBlending});
+    grp.add(new THREE.Points(geo, mat));
+    var lg = new THREE.Group(); grp.add(lg);
+    function co(r,rx,ry){var cv=new THREE.EllipseCurve(0,0,r,r,0,2*Math.PI,false,0);var g2=new THREE.BufferGeometry().setFromPoints(cv.getPoints(128));var m2=new THREE.LineBasicMaterial({color:0xdc2626,transparent:true,opacity:0.2});var o=new THREE.Line(g2,m2);o.rotation.x=rx;o.rotation.y=ry;lg.add(o);return o;}
+    var orbs = [co(5.8,Math.PI/2,0), co(5.4,Math.PI/3,Math.PI/6), co(6.3,Math.PI/1.8,Math.PI/4)];
+
+    function adj(){
+        if(isMobile()){
+            // 3x bigger on mobile
+            grp.position.set(0, 0.3, -1);
+            grp.scale.set(2.1, 2.1, 2.1);
+        } else {
+            grp.position.set(2, 0, -2);
+            grp.scale.set(1, 1, 1);
+        }
+    }
+    adj();
+
+    var mx=0, my=0;
+    document.addEventListener('mousemove', function(e){
+        mx=(e.clientX/window.innerWidth)*2-1; my=-(e.clientY/window.innerHeight)*2+1;
+        uni.uMouse.value.x+=(mx-uni.uMouse.value.x)*.05;
+        uni.uMouse.value.y+=(my-uni.uMouse.value.y)*.05;
+    });
+    window.addEventListener('resize', function(){
+        cam.aspect=c.clientWidth/c.clientHeight; cam.updateProjectionMatrix();
+        ren.setSize(c.clientWidth, c.clientHeight); adj(); setupMobileHint();
+    });
+
+    var t = 0;
     (function anim(){
-        requestAnimationFrame(anim);t+=.015;
-        grp.rotation.y=t*.05;grp.rotation.z=Math.sin(t*.1)*.05;
-        lg.rotation.x=Math.sin(t*.05)*.2;
-        orbs.forEach(function(o,i){o.rotation.z+=.002*(i+1)});
-        cam.position.x+=(mx*.5-cam.position.x)*.05;
-        cam.position.y+=(my*.5-cam.position.y)*.05;
-        cam.lookAt(0,0,0);uni.uTime.value=t;
-        if(aiThinking){uni.uDistortion.value=0.6+Math.sin(t*4)*0.8+Math.sin(t*7)*0.4}
-        else{uni.uDistortion.value+=(baseDistortion-uni.uDistortion.value)*0.05}
-        var tOp=chatOpen?0.85:0.5;var cur=parseFloat(c.style.opacity)||0.5;c.style.opacity=cur+(tOp-cur)*0.04;
-        ren.render(scene,cam);
+        requestAnimationFrame(anim);
+        t += 0.02;
+        grp.rotation.y = t*0.04;
+        grp.rotation.z = Math.sin(t*0.08)*0.06;
+        lg.rotation.x = Math.sin(t*0.05)*0.25;
+        orbs.forEach(function(o,i){ o.rotation.z += 0.0015*(i+1); });
+        cam.position.x += (mx*0.5 - cam.position.x)*0.04;
+        cam.position.y += (my*0.5 - cam.position.y)*0.04;
+        cam.lookAt(0,0,0);
+        uni.uTime.value = t;
+
+        // ── Distortion state machine ──
+        var now = performance.now();
+        if (orbState === 'spike') {
+            // Sharp spike that peaks then transitions to thinking
+            var elapsed = (now - spikeTime) / 1000;
+            if (elapsed < 0.4) {
+                // Rapid ramp up
+                currentDistortion += (3.8 - currentDistortion) * 0.2;
+            } else {
+                // Transition to thinking
+                startThinking();
+            }
+        } else if (orbState === 'thinking') {
+            // Active oscillation while waiting for response
+            currentDistortion = 1.8 + Math.sin(t*3.5)*1.0 + Math.sin(t*6.2)*0.5 + Math.sin(t*1.8)*0.3;
+        } else if (orbState === 'settle') {
+            // Smooth decay back to idle
+            currentDistortion += (baseDistortion - currentDistortion) * 0.025;
+            if (Math.abs(currentDistortion - baseDistortion) < 0.05) {
+                currentDistortion = baseDistortion;
+                orbState = 'idle';
+            }
+        } else {
+            // idle
+            currentDistortion += (baseDistortion - currentDistortion) * 0.03;
+        }
+
+        uni.uDistortion.value = currentDistortion;
+
+        if(!isMobile()){
+            var tOp = chatOpen ? 0.7 : 0.55;
+            var cur = parseFloat(c.style.opacity) || 0.55;
+            c.style.opacity = (cur+(tOp-cur)*0.04).toFixed(3);
+        }
+        ren.render(scene, cam);
     })();
-    c.addEventListener('click',function(){if(!chatOpen)openChat()});
+
+    c.addEventListener('click', function(){ if(!chatOpen) openChat(); });
 })();
+
+function setupMobileHint(){
+    var mh = document.getElementById('mobile-hint');
+    if(isMobile()){ mh.style.display = chatOpen ? 'none' : 'flex'; }
+    else { mh.style.display = 'none'; }
+}
+setupMobileHint();
 
 // ═══════════ CHAT ═══════════
 (function(){
-    var ov=document.getElementById('chat-overlay'),hint=document.getElementById('orb-hint'),cls=document.getElementById('chat-close'),inp=document.getElementById('chat-input'),snd=document.getElementById('chat-send'),msgs=document.getElementById('chat-messages'),limEl=document.getElementById('chat-limit');
-    var MAX=8,qC=0;
-    function upLim(){var l=MAX-qC;if(l<=3&&l>0)limEl.textContent=l+' questions remaining';else if(l<=0)limEl.textContent='Limit reached — check the résumé for more';else limEl.textContent=''}
+    var ov=document.getElementById('chat-overlay'), hint=document.getElementById('arrow-hint'), mhint=document.getElementById('mobile-hint'), cls=document.getElementById('chat-close'), inp=document.getElementById('chat-input'), snd=document.getElementById('chat-send'), msgs=document.getElementById('chat-messages'), limEl=document.getElementById('chat-limit');
+    var MAX=8, qC=0;
+    function upLim(){ var l=MAX-qC; if(l<=3&&l>0) limEl.textContent=l+' questions remaining'; else if(l<=0) limEl.textContent='Limit reached — check the résumé for more'; else limEl.textContent=''; }
 
-    window.openChat=function(){
-        chatOpen=true;ov.classList.add('open');hint.classList.add('gone');
-        setTimeout(function(){inp.focus()},250);
+    window.openChat = function(){
+        chatOpen=true; ov.classList.add('open');
+        if(hint) hint.classList.add('gone');
+        if(mhint) mhint.classList.add('gone');
+        setTimeout(function(){ inp.focus(); }, 300);
     };
-    cls.addEventListener('click',function(){chatOpen=false;ov.classList.remove('open');hint.classList.remove('gone')});
+    cls.addEventListener('click', function(){
+        chatOpen=false; ov.classList.remove('open');
+        if(hint) hint.classList.remove('gone');
+        if(mhint){ mhint.classList.remove('gone'); setupMobileHint(); }
+        stopThinking();
+    });
 
     var SYS=`You are an AI assistant embedded on Nathan Liu's personal website. Answer ONLY from the info below. Be concise (2-4 sentences). Sound natural and conversational. If unsure, say so.
 
@@ -390,23 +406,32 @@ AWARDS: Llama Ventures Top 5 (2026), Astronaut Scholarship Top 8 at Berkeley (20
 
 Contact: NathanL2132@berkeley.edu | linkedin.com/in/nathan-sr-liu`;
 
-    var hist=[],loading=false;
-    function addMsg(t,r){var d=document.createElement('div');d.className='chat-msg '+r;d.textContent=t;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
+    var hist=[], loading=false;
+    function addMsg(t,r){ var d=document.createElement('div'); d.className='chat-msg '+r; d.textContent=t; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; return d; }
 
     async function send(){
-        var q=inp.value.trim();if(!q||loading)return;
-        if(qC>=MAX){inp.value='';addMsg("I've hit the question limit for this session. Feel free to check Nathan's résumé or email him directly.",'ai');return}
-        inp.value='';addMsg(q,'user');hist.push({role:'user',content:q});qC++;upLim();
-        loading=true;snd.disabled=true;aiThinking=true;
-        var th=document.createElement('div');th.className='chat-msg ai';th.innerHTML='<span class="thinking">Thinking...</span>';msgs.appendChild(th);msgs.scrollTop=msgs.scrollHeight;
+        var q = inp.value.trim(); if(!q || loading) return;
+        if(qC >= MAX){ inp.value=''; addMsg("I've hit the question limit for this session. Feel free to check Nathan's résumé or email him directly.",'ai'); return; }
+        inp.value=''; addMsg(q,'user'); hist.push({role:'user',content:q}); qC++; upLim();
+
+        // Spike on send
+        triggerSpike();
+
+        loading=true; snd.disabled=true;
+        var th=document.createElement('div'); th.className='chat-msg ai'; th.innerHTML='<span class="thinking">Thinking...</span>'; msgs.appendChild(th); msgs.scrollTop=msgs.scrollHeight;
+
         try{
-            var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,system:SYS,messages:hist.slice(-8)})});
-            var data=await res.json();var ans=data.content?.map(function(b){return b.text||''}).join('')||"Sorry, I couldn't process that.";
-            th.remove();addMsg(ans,'ai');hist.push({role:'assistant',content:ans});
-        }catch(e){th.remove();addMsg('Something went wrong. Please try again.','ai')}
-        aiThinking=false;loading=false;snd.disabled=false;
+            var res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,system:SYS,messages:hist.slice(-8)})});
+            var data = await res.json();
+            var ans = data.content?.map(function(b){return b.text||''}).join('') || "Sorry, I couldn't process that.";
+            th.remove(); addMsg(ans,'ai'); hist.push({role:'assistant',content:ans});
+        } catch(e) { th.remove(); addMsg('Something went wrong. Please try again.','ai'); }
+
+        stopThinking();
+        loading=false; snd.disabled=false;
     }
-    snd.addEventListener('click',send);inp.addEventListener('keydown',function(e){if(e.key==='Enter')send()});
+    snd.addEventListener('click', send);
+    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') send(); });
 })();
 </script>
 </body>
