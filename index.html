@@ -9,89 +9,92 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@200;300;400;500&family=JetBrains+Mono:wght@200;300;400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root{
-            --bg:#FDFCF8;--fg:#1C1917;--muted:#78716c;--light:#a8a29e;--lighter:#d6d3d1;
-            --red:#dc2626;--border:rgba(28,25,23,0.1);
-            --display:'Cormorant Garamond',Georgia,serif;
-            --body:'Inter',system-ui,sans-serif;
-            --mono:'JetBrains Mono',monospace;
-        }
+        :root{--bg:#FDFCF8;--fg:#1C1917;--muted:#78716c;--light:#a8a29e;--lighter:#d6d3d1;--red:#dc2626;--border:rgba(28,25,23,0.1);--display:'Cormorant Garamond',Georgia,serif;--body:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         ::selection{background:#e7e5e4;color:var(--fg)}
-        html{font-size:16px;scroll-behavior:smooth}
+        html{font-size:16px}
         body{font-family:var(--body);font-weight:300;color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
         .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-size:40px 40px;background-image:linear-gradient(to right,rgba(28,25,23,0.025) 1px,transparent 1px),linear-gradient(to bottom,rgba(28,25,23,0.025) 1px,transparent 1px);mask-image:linear-gradient(to bottom,black 25%,transparent 60%);-webkit-mask-image:linear-gradient(to bottom,black 25%,transparent 60%)}
 
-        #three-container{position:fixed;top:0;right:0;width:66vw;height:100vh;z-index:0;cursor:pointer;transition:opacity .5s;opacity:0.55}
+        /* Orb: right 50% */
+        #three-container{position:fixed;top:0;right:0;width:50vw;height:100vh;z-index:0;cursor:pointer;opacity:0.55;transition:opacity .5s}
 
-        .arrow-hint{position:fixed;z-index:15;pointer-events:none;left:34vw;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:0;transition:opacity .6s,transform .6s}
-        .arrow-hint.gone{opacity:0;transform:translateY(-50%) translateX(20px)}
+        /* Arrow hint */
+        .arrow-hint{position:fixed;z-index:15;pointer-events:none;left:50vw;top:50%;transform:translate(-12px,-50%);display:flex;align-items:center;gap:0;transition:opacity .6s,transform .6s}
+        .arrow-hint.gone{opacity:0;transform:translate(10px,-50%)}
         @keyframes arrowNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
-        .arrow-label{display:flex;flex-direction:column;align-items:flex-end;margin-right:.6rem}
-        .arrow-label-main{font-family:var(--display);font-style:italic;font-size:.95rem;color:var(--muted);white-space:nowrap}
-        .arrow-label-sub{font-family:var(--mono);font-size:.45rem;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-top:.15rem}
+        .arrow-label{display:flex;flex-direction:column;align-items:flex-end;margin-right:.5rem}
+        .arrow-label-main{font-family:var(--display);font-style:italic;font-size:.85rem;color:var(--muted);white-space:nowrap}
+        .arrow-label-sub{font-family:var(--mono);font-size:.4rem;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-top:.1rem}
         .arrow-svg{animation:arrowNudge 2s ease-in-out infinite;flex-shrink:0}
 
-        .chat-overlay{position:fixed;top:0;right:0;width:66vw;height:100vh;z-index:20;display:none;flex-direction:column;pointer-events:none}
+        /* Chat overlay */
+        .chat-overlay{position:fixed;top:0;right:0;width:50vw;height:100vh;z-index:20;display:none;flex-direction:column;pointer-events:none}
         .chat-overlay.open{display:flex}
-        .chat-messages{flex:1;overflow-y:auto;padding:4rem 2.5rem 1rem;display:flex;flex-direction:column;gap:.6rem;pointer-events:auto;mask-image:linear-gradient(to bottom,transparent 0%,black 6%,black 90%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 6%,black 90%,transparent 100%)}
-        .chat-msg{font-size:.8rem;line-height:1.65;max-width:75%}
-        .chat-msg.user{align-self:flex-end;background:var(--fg);color:var(--bg);padding:.5rem .85rem;border-radius:14px 14px 3px 14px}
-        .chat-msg.ai{align-self:flex-start;color:var(--fg);padding:.5rem .6rem;background:rgba(253,252,248,0.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:3px 14px 14px 14px;border:1px solid rgba(28,25,23,0.06)}
+        .chat-messages{flex:1;overflow-y:auto;padding:3rem 2rem 1rem;display:flex;flex-direction:column;gap:.5rem;pointer-events:auto;mask-image:linear-gradient(to bottom,transparent 0%,black 5%,black 92%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 5%,black 92%,transparent 100%)}
+        .chat-msg{font-size:.78rem;line-height:1.6;max-width:78%}
+        .chat-msg.user{align-self:flex-end;background:var(--fg);color:var(--bg);padding:.45rem .8rem;border-radius:14px 14px 3px 14px}
+        .chat-msg.ai{align-self:flex-start;color:var(--fg);padding:.45rem .55rem;background:rgba(253,252,248,0.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:3px 14px 14px 14px;border:1px solid rgba(28,25,23,0.06)}
         .chat-msg .thinking{color:var(--light);font-style:italic}
-        .chat-input-row{padding:1rem 2.5rem 2.5rem;display:flex;gap:.5rem;pointer-events:auto}
-        .chat-input{flex:1;font-family:var(--body);font-size:.82rem;font-weight:300;padding:.65rem .9rem;border:1px solid rgba(28,25,23,0.12);border-radius:8px;background:rgba(253,252,248,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--fg);outline:none;transition:border-color .15s}
+        .chat-input-row{padding:.75rem 2rem 2rem;display:flex;gap:.5rem;pointer-events:auto}
+        .chat-input{flex:1;font-family:var(--body);font-size:.8rem;font-weight:300;padding:.6rem .85rem;border:1px solid rgba(28,25,23,0.12);border-radius:8px;background:rgba(253,252,248,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--fg);outline:none;transition:border-color .15s}
         .chat-input:focus{border-color:var(--red)}
         .chat-input::placeholder{color:var(--light)}
-        .chat-send{background:var(--fg);color:var(--bg);border:none;cursor:pointer;padding:.55rem .9rem;border-radius:8px;font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;transition:background .12s;white-space:nowrap}
+        .chat-send{background:var(--fg);color:var(--bg);border:none;cursor:pointer;padding:.5rem .85rem;border-radius:8px;font-family:var(--mono);font-size:.5rem;text-transform:uppercase;letter-spacing:.08em;transition:background .12s;white-space:nowrap}
         .chat-send:hover{background:#44403c}
         .chat-send:disabled{opacity:.4;cursor:default}
-        .chat-close-btn{position:absolute;top:1.25rem;right:1.75rem;z-index:25;background:rgba(253,252,248,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(28,25,23,0.08);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .12s,background .12s;pointer-events:auto}
+        .chat-close-btn{position:absolute;top:1rem;right:1.5rem;z-index:25;background:rgba(253,252,248,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(28,25,23,0.08);border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .12s,background .12s;pointer-events:auto}
         .chat-close-btn:hover{color:var(--fg);background:rgba(253,252,248,0.95)}
-        .chat-limit{font-family:var(--mono);font-size:.5rem;color:var(--light);letter-spacing:.05em;text-align:center;padding:0 2rem .5rem;pointer-events:auto}
+        .chat-limit{font-family:var(--mono);font-size:.45rem;color:var(--light);letter-spacing:.05em;text-align:center;padding:0 2rem .4rem;pointer-events:auto}
 
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
-        .f{animation:fadeUp 1s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
-        .d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}.d4{animation-delay:.48s}.d5{animation-delay:.62s}
+        .f{animation:fadeUp .9s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+        .d1{animation-delay:.06s}.d2{animation-delay:.14s}.d3{animation-delay:.24s}.d4{animation-delay:.36s}.d5{animation-delay:.48s}
 
-        .page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:520px;width:34vw;padding:4rem 2rem 3rem}
-        .hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-        .hdr-name{font-family:var(--display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em}
+        /* Page: left 50%, everything fits one viewport */
+        .page{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;justify-content:center;width:50vw;max-width:600px;padding:2.5rem 2.5rem 2rem}
+
+        .hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--border)}
+        .hdr-name{font-family:var(--display);font-size:1.4rem;font-weight:400;letter-spacing:-0.02em}
         .hdr-name em{font-style:italic;color:var(--red)}
-        .hdr-links{display:flex;gap:1rem;align-items:center}
-        .hdr-links a{font-family:var(--mono);font-size:.55rem;font-weight:300;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-decoration:none;transition:color .15s}
+        .hdr-links{display:flex;gap:.9rem;align-items:center}
+        .hdr-links a{font-family:var(--mono);font-size:.5rem;font-weight:300;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-decoration:none;transition:color .15s}
         .hdr-links a:hover{color:var(--fg)}
-        .tag{font-family:var(--display);font-size:clamp(1.4rem,2.5vw,2.2rem);font-weight:300;line-height:1.2;letter-spacing:-0.02em;margin-bottom:1.75rem}
+        .tag{font-family:var(--display);font-size:clamp(1.3rem,2.2vw,1.9rem);font-weight:300;line-height:1.2;letter-spacing:-0.02em;margin-bottom:1.1rem}
         .tag em{font-style:italic;color:var(--red);font-weight:400}
-        .school{font-family:var(--mono);font-size:.55rem;font-weight:300;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-bottom:1.75rem;display:flex;align-items:center;gap:.6rem}
-        .school::before{content:'';width:18px;height:1px;background:var(--red)}
-        .creds{display:grid;grid-template-columns:1fr;gap:1.1rem;margin-bottom:1.75rem}
-        .cl{font-family:var(--mono);font-size:.5rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.4rem}
+        .school{font-family:var(--mono);font-size:.48rem;font-weight:300;text-transform:uppercase;letter-spacing:.12em;color:var(--light);margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem}
+        .school::before{content:'';width:16px;height:1px;background:var(--red)}
+
+        .creds{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem 1.25rem;margin-bottom:1.2rem}
+        .cl{font-family:var(--mono);font-size:.42rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.3rem}
         .clist{list-style:none}
-        .clist li{font-size:.72rem;font-weight:400;line-height:1.3;margin-bottom:.25rem}
+        .clist li{font-size:.65rem;font-weight:400;line-height:1.25;margin-bottom:.2rem}
         .clist li a{color:var(--fg);text-decoration:none;transition:color .12s}
         .clist li a:hover{color:var(--red)}
-        .clist .r{font-size:.6rem;font-weight:300;color:var(--light)}
-        .wh{font-family:var(--mono);font-size:.5rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.5rem}
-        .wt{width:100%;border-collapse:collapse;margin-bottom:1.75rem}
+        .clist .r{font-size:.52rem;font-weight:300;color:var(--light)}
+
+        .wh{font-family:var(--mono);font-size:.42rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.4rem}
+        .wt{width:100%;border-collapse:collapse;margin-bottom:1rem}
         .wt tr{border-bottom:1px solid var(--border);transition:background .12s}
         .wt tr:first-child{border-top:1px solid var(--border)}
         .wt tr:hover{background:rgba(220,38,38,.035)}
-        .wt td{padding:.55rem 0;vertical-align:top}
-        .wo{font-family:var(--mono);font-size:.55rem;font-weight:400;text-transform:uppercase;letter-spacing:.06em;color:var(--red);width:90px;padding-right:.6rem;white-space:nowrap;padding-top:.58rem}
-        .wr{font-size:.72rem;font-weight:400;color:var(--fg);line-height:1.6}
-        .wr .bg{font-size:.62rem;font-weight:300;color:var(--light);display:block;margin-bottom:.15rem}
-        .ft{display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.5rem}
-        .ft-links{display:flex;gap:.6rem}
-        .ft-links a{font-size:.65rem;font-weight:400;color:var(--fg);text-decoration:none;padding:.2rem .65rem;border:1px solid var(--border);border-radius:999px;transition:all .12s;display:inline-flex;align-items:center;gap:.3rem}
-        .ft-links a:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-        .ft-links a svg{width:10px;height:10px}
-        .ft-r{display:flex;align-items:center;gap:.3rem}
-        .pdot{width:5px;height:5px;border-radius:50%;background:#16a34a;animation:pulse 3s ease-in-out infinite}
-        .ft-s{font-family:var(--mono);font-size:.45rem;font-weight:300;color:var(--light);letter-spacing:.05em}
+        .wt td{padding:.4rem 0;vertical-align:top}
+        .wo{font-family:var(--mono);font-size:.48rem;font-weight:400;text-transform:uppercase;letter-spacing:.05em;color:var(--red);width:80px;padding-right:.5rem;white-space:nowrap;padding-top:.45rem}
+        .wr{font-size:.62rem;font-weight:400;color:var(--fg);line-height:1.55}
+        .wr .bg{font-size:.54rem;font-weight:300;color:var(--light);display:block;margin-bottom:.1rem}
 
+        .ft{display:flex;justify-content:space-between;align-items:center;padding-top:.7rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.4rem}
+        .ft-links{display:flex;gap:.5rem}
+        .ft-links a{font-size:.55rem;font-weight:400;color:var(--fg);text-decoration:none;padding:.15rem .55rem;border:1px solid var(--border);border-radius:999px;transition:all .12s;display:inline-flex;align-items:center;gap:.25rem}
+        .ft-links a:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+        .ft-links a svg{width:9px;height:9px}
+        .ft-r{display:flex;align-items:center;gap:.25rem}
+        .pdot{width:4px;height:4px;border-radius:50%;background:#16a34a;animation:pulse 3s ease-in-out infinite}
+        .ft-s{font-family:var(--mono);font-size:.4rem;font-weight:300;color:var(--light);letter-spacing:.05em}
+
+        /* ══════════ MOBILE ══════════ */
         @media(max-width:900px){
             body{display:flex;flex-direction:column}
             #three-container{position:sticky;top:0;left:0;width:100vw;height:45vh;opacity:0.75 !important;z-index:2;flex-shrink:0;cursor:pointer}
@@ -101,15 +104,18 @@
             .chat-messages{padding:3.5rem 1.25rem 1rem}
             .chat-input-row{padding:.75rem 1.25rem 1.5rem}
             .chat-close-btn{top:1rem;right:1rem}
-            .page{width:100%;max-width:100%;min-height:auto;padding:2rem 1.5rem 2.5rem;background:var(--bg);position:relative;z-index:3}
-            .hdr{flex-direction:column;gap:.6rem}
-            .hdr-links{flex-wrap:wrap;gap:.8rem}
-            .tag{font-size:1.5rem;margin-bottom:1.25rem}
-            .creds{grid-template-columns:1fr 1fr;gap:1rem}
-            .wt .wo{width:70px;font-size:.5rem}
-            .wt .wr{font-size:.68rem}
-            .wt .wr .bg{font-size:.56rem}
-            .ft{flex-direction:column;align-items:flex-start;gap:.6rem}
+            .page{width:100%;max-width:100%;height:auto;min-height:auto;padding:1.75rem 1.5rem 2rem;background:var(--bg);position:relative;z-index:3}
+            .hdr{flex-direction:column;gap:.5rem}
+            .hdr-links{flex-wrap:wrap;gap:.7rem}
+            .hdr-name{font-size:1.3rem}
+            .tag{font-size:1.35rem;margin-bottom:1rem}
+            .creds{grid-template-columns:1fr 1fr;gap:.8rem}
+            .clist li{font-size:.68rem}
+            .clist .r{font-size:.56rem}
+            .wt .wo{width:65px;font-size:.46rem}
+            .wt .wr{font-size:.6rem}
+            .wt .wr .bg{font-size:.52rem}
+            .ft{flex-direction:column;align-items:flex-start;gap:.5rem}
         }
         .mobile-hint{display:none;position:absolute;z-index:16;left:50%;bottom:1.25rem;transform:translateX(-50%);align-items:center;gap:.5rem;pointer-events:none;transition:opacity .4s}
         .mobile-hint.gone{opacity:0}
@@ -122,18 +128,14 @@
 <body>
 
 <div class="grid-bg"></div>
-
-<div class="orb-wrapper" style="position:relative;flex-shrink:0">
+<div style="position:relative;flex-shrink:0">
     <div id="three-container"></div>
-    <div class="mobile-hint" id="mobile-hint">
-        <div><div class="mobile-hint-text">Tap to chat with me</div><div class="mobile-hint-sub">AI-powered · Knows Nathan's work</div></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" stroke-width="1.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
-    </div>
+    <div class="mobile-hint" id="mobile-hint"><div><div class="mobile-hint-text">Tap to chat with me</div><div class="mobile-hint-sub">AI-powered · Knows Nathan's work</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" stroke-width="1.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></div>
 </div>
 
 <div class="arrow-hint" id="arrow-hint">
     <div class="arrow-label"><div class="arrow-label-main">Click to chat with me</div><div class="arrow-label-sub">AI-powered · Knows Nathan's work</div></div>
-    <svg class="arrow-svg" width="48" height="32" viewBox="0 0 48 32" fill="none"><path d="M0 16 C12 16, 20 6, 32 6 C38 6, 42 10, 46 16" stroke="#a8a29e" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M40 12 L46 16 L40 20" stroke="#a8a29e" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="arrow-svg" width="44" height="28" viewBox="0 0 44 28" fill="none"><path d="M0 14 C10 14,18 5,28 5 C34 5,38 9,42 14" stroke="#a8a29e" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M36 10 L42 14 L36 18" stroke="#a8a29e" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </div>
 
 <div class="chat-overlay" id="chat-overlay">
@@ -155,11 +157,11 @@
     <div class="f d4">
         <div class="wh">Selected Work</div>
         <table class="wt">
-            <tr><td class="wo">EntroPINN</td><td class="wr"><span class="bg">VC-backed startup building physics-informed neural networks for industrial process optimization.</span>Developed scalable PINN-based heat transfer optimization frameworks for industrial processes, partnering with AI teams at AVEVA, Siemens, and others targeting the industrial digital twin market. Enabling rapid design iteration and high-fidelity process simulation with 70+ process engineers interviewed.</td></tr>
-            <tr><td class="wo">Paradromics</td><td class="wr"><span class="bg">Preclinical neurotechnology company developing high-bandwidth intracortical brain-computer interfaces.</span>Built neural decoding algorithms for auditory cortex recordings on the Connexus BCI, achieving 200+ bps low-latency data transfer rate benchmarked at 20×+ the reported throughput of existing intracortical systems. Designed and tested smart-device control in 15+ successful lab experiments validating real-time BCI interaction.</td></tr>
-            <tr><td class="wo">Peidong Yang Group</td><td class="wr"><span class="bg">Lawrence Berkeley National Laboratory. Funded by The Kavli Foundation, Bakar Labs, Berkeley Discovery Hub.</span>ML-driven discovery and optimization of next-generation catalysts for CO₂ electrochemical reduction. Conduct H-cell electrolysis, electrochemical impedance spectroscopy, in situ Raman spectroscopy, TEM imaging, and SECCM. Upcoming JACS publication on Cu nanograin vibrational spectroscopy.</td></tr>
-            <tr><td class="wo">Industry Co-op</td><td class="wr"><span class="bg">Company specializing in R&amp;D and industrialization of engine exhaust after-treatment products.</span>Co-developed ML-empowered multiparametric emission monitoring system for commercial diesel fleets, tracking engine torque, fuel consumption, NOx, particulate matter, and 30+ parameters to predict emissions. Deployed across 16,200+ vehicles worldwide, reducing nitrogen oxide emissions by 14% (&gt;2,100 tons).</td></tr>
-            <tr><td class="wo">UN Millennium Fellowship</td><td class="wr"><span class="bg">Civic leadership program presented by the United Nations Academic Impact and Millennium Campus Network.</span>Led 4 projects with 50+ volunteers from 6 countries to complete 750+ service hours, benefiting 500+ underprivileged families. Initiated collaborations with city governments and NGOs on social projects. Engaged in policy webinars with UN and Gates Foundation leadership.</td></tr>
+            <tr><td class="wo">EntroPINN</td><td class="wr"><span class="bg">VC-backed startup building physics-informed neural networks for industrial process optimization.</span>Developed scalable PINN-based heat transfer optimization frameworks, partnering with AI teams at AVEVA, Siemens, and others targeting the industrial digital twin market. 70+ process engineers interviewed.</td></tr>
+            <tr><td class="wo">Paradromics</td><td class="wr"><span class="bg">Preclinical neurotechnology company developing high-bandwidth intracortical brain-computer interfaces.</span>Built neural decoding algorithms for auditory cortex recordings on Connexus BCI, achieving 200+ bps at 20×+ existing throughput. 15+ successful lab experiments validating real-time BCI interaction.</td></tr>
+            <tr><td class="wo">Peidong Yang Group</td><td class="wr"><span class="bg">Lawrence Berkeley National Laboratory. Funded by The Kavli Foundation, Bakar Labs, Berkeley Discovery Hub.</span>ML-driven discovery of next-gen catalysts for CO₂ electrochemical reduction. H-cell electrolysis, EIS, in situ Raman, TEM, SECCM. Upcoming JACS publication.</td></tr>
+            <tr><td class="wo">Industry Co-op</td><td class="wr"><span class="bg">Company specializing in R&amp;D and industrialization of engine exhaust after-treatment products.</span>Co-developed ML multiparametric emission monitoring for diesel fleets tracking 30+ parameters. Deployed across 16,200+ vehicles, reducing NOx by 14% (&gt;2,100 tons).</td></tr>
+            <tr><td class="wo">UN Millennium Fellowship</td><td class="wr"><span class="bg">Civic leadership program by the United Nations Academic Impact and Millennium Campus Network.</span>Led 4 projects, 50+ volunteers from 6 countries, 750+ service hours, 500+ families. Collaborations with city governments and NGOs.</td></tr>
         </table>
     </div>
     <div class="ft f d5">
@@ -169,269 +171,139 @@
 </div>
 
 <script>
-// ═══════════ REACTIVITY STATE ═══════════
-// States: idle (1.4) -> spike (3.5, instant on send) -> thinking (oscillates 1.4–2.9) -> settle (back to 1.4)
-var orbState = 'idle';    // idle | spike | thinking | settle
-var spikeTime = 0;        // when the spike started
-var baseDistortion = 1.4;
-var targetDistortion = 1.4;
-var currentDistortion = 1.4;
-var chatOpen = false;
+var orbState='idle',spikeTime=0,baseDistortion=1.4,currentDistortion=1.4,chatOpen=false;
+function triggerSpike(){orbState='spike';spikeTime=performance.now()}
+function startThinking(){orbState='thinking'}
+function stopThinking(){orbState='settle'}
+function isMobile(){return window.innerWidth<=900}
 
-function triggerSpike() {
-    orbState = 'spike';
-    spikeTime = performance.now();
-    targetDistortion = 3.8;
-}
-function startThinking() { orbState = 'thinking'; }
-function stopThinking() { orbState = 'settle'; targetDistortion = baseDistortion; }
-
-function isMobile() { return window.innerWidth <= 900; }
-
-// ═══════════ THREE.JS ═══════════
 (function(){
-    var c = document.getElementById('three-container'); if (!c) return;
-
-    var vs = `
-uniform float uTime;
-uniform float uDistortion;
-uniform float uSize;
-uniform vec2 uMouse;
-varying float vNoise;
-varying vec3 vPos;
-
+    var c=document.getElementById('three-container');if(!c)return;
+    var vs=`
+uniform float uTime;uniform float uDistortion;uniform float uSize;uniform vec2 uMouse;
+varying float vNoise;varying vec3 vPos;
 vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
 vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
 vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
-
-float snoise(vec3 v){
-  const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0.,.5,1.,2.);
-  vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);
-  vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.-g;
-  vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);
-  vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+2.*C.xxx;vec3 x3=x0-1.+3.*C.xxx;
-  i=mod289(i);
-  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
-  float n_=1./7.;vec3 ns=n_*D.wyz-D.xzx;
-  vec4 j=p-49.*floor(p*ns.z*ns.z);
-  vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.*x_);
-  vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;
-  vec4 h=1.-abs(x)-abs(y);
-  vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
-  vec4 s0=floor(b0)*2.+1.;vec4 s1=floor(b1)*2.+1.;
-  vec4 sh=-step(h,vec4(0.));
-  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-  vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
-  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-  p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);
-  m=m*m;
-  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-}
-
+float snoise(vec3 v){const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0.,.5,1.,2.);vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.-g;vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+2.*C.xxx;vec3 x3=x0-1.+3.*C.xxx;i=mod289(i);vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));float n_=1./7.;vec3 ns=n_*D.wyz-D.xzx;vec4 j=p-49.*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.*x_);vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.-abs(x)-abs(y);vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);vec4 s0=floor(b0)*2.+1.;vec4 s1=floor(b1)*2.+1.;vec4 sh=-step(h,vec4(0.));vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m=m*m;return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));}
 void main(){
-  vec3 pos = position;
-  float n1 = snoise(vec3(pos.x*0.3 + uTime*0.25, pos.y*0.3 + uTime*0.15, pos.z*0.3));
-  float n2 = snoise(vec3(pos.y*0.2 - uTime*0.12, pos.z*0.2 + uTime*0.18, pos.x*0.2));
-  float noise = n1 * 0.65 + n2 * 0.35;
-  vNoise = noise;
-  vec3 dir = normalize(pos);
-  vec3 newPos = pos + dir * noise * uDistortion;
-  float breath = sin(uTime * 0.4) * 0.15 + 1.0;
-  newPos *= breath;
-  float dist = distance(uMouse * 10.0, newPos.xy);
-  float interaction = smoothstep(5.0, 0.0, dist);
-  newPos += dir * interaction * 0.6;
-  vec4 mvPosition = modelViewMatrix * vec4(newPos, 1.0);
-  gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = uSize * (24.0 / -mvPosition.z) * (1.0 + noise * 0.4);
-  vPos = newPos;
+  vec3 pos=position;
+  float n1=snoise(vec3(pos.x*0.3+uTime*0.45,pos.y*0.3+uTime*0.3,pos.z*0.3));
+  float n2=snoise(vec3(pos.y*0.2-uTime*0.25,pos.z*0.2+uTime*0.35,pos.x*0.2));
+  float noise=n1*0.6+n2*0.4;
+  vNoise=noise;
+  vec3 dir=normalize(pos);
+  vec3 newPos=pos+dir*noise*uDistortion;
+  float breath=sin(uTime*0.6)*0.12+1.0;
+  newPos*=breath;
+  float dist=distance(uMouse*10.0,newPos.xy);
+  float interaction=smoothstep(5.0,0.0,dist);
+  newPos+=dir*interaction*0.6;
+  vec4 mvPosition=modelViewMatrix*vec4(newPos,1.0);
+  gl_Position=projectionMatrix*mvPosition;
+  gl_PointSize=uSize*(24.0/-mvPosition.z)*(1.0+noise*0.4);
+  vPos=newPos;
 }`;
+    var fs=`
+uniform vec3 uColor;uniform float uOpacity;varying float vNoise;varying vec3 vPos;
+void main(){vec2 center=gl_PointCoord-vec2(0.5);float dist=length(center);if(dist>0.5)discard;float alpha=smoothstep(0.5,0.15,dist)*uOpacity;vec3 darkColor=uColor*0.4;vec3 lightColor=uColor*1.9;vec3 finalColor=mix(darkColor,lightColor,vNoise*0.5+0.5);gl_FragColor=vec4(finalColor,alpha);}`;
 
-    var fs = `
-uniform vec3 uColor;
-uniform float uOpacity;
-varying float vNoise;
-varying vec3 vPos;
-void main(){
-  vec2 center = gl_PointCoord - vec2(0.5);
-  float dist = length(center);
-  if(dist > 0.5) discard;
-  float alpha = smoothstep(0.5, 0.15, dist) * uOpacity;
-  vec3 darkColor = uColor * 0.4;
-  vec3 lightColor = uColor * 1.9;
-  vec3 finalColor = mix(darkColor, lightColor, vNoise * 0.5 + 0.5);
-  gl_FragColor = vec4(finalColor, alpha);
-}`;
-
-    var scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0xfdfcf8, 0.03);
-    var cam = new THREE.PerspectiveCamera(50, c.clientWidth/c.clientHeight, 0.1, 100); cam.position.set(0,0,18);
-    var ren = new THREE.WebGLRenderer({antialias:true, alpha:true}); ren.setSize(c.clientWidth, c.clientHeight); ren.setPixelRatio(Math.min(window.devicePixelRatio,2)); c.appendChild(ren.domElement);
-    var grp = new THREE.Group(); scene.add(grp);
-    var geo = new THREE.IcosahedronGeometry(4.5, 30);
-    var uni = {uTime:{value:0}, uDistortion:{value:1.4}, uSize:{value:3.0}, uColor:{value:new THREE.Color('#dc2626')}, uOpacity:{value:0.75}, uMouse:{value:new THREE.Vector2(0,0)}};
-    var mat = new THREE.ShaderMaterial({vertexShader:vs, fragmentShader:fs, uniforms:uni, transparent:true, depthWrite:false, blending:THREE.NormalBlending});
-    grp.add(new THREE.Points(geo, mat));
-    var lg = new THREE.Group(); grp.add(lg);
+    var scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0xfdfcf8,0.03);
+    var cam=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,100);cam.position.set(0,0,18);
+    var ren=new THREE.WebGLRenderer({antialias:true,alpha:true});ren.setSize(c.clientWidth,c.clientHeight);ren.setPixelRatio(Math.min(window.devicePixelRatio,2));c.appendChild(ren.domElement);
+    var grp=new THREE.Group();scene.add(grp);
+    var geo=new THREE.IcosahedronGeometry(4.5,30);
+    var uni={uTime:{value:0},uDistortion:{value:1.4},uSize:{value:3.0},uColor:{value:new THREE.Color('#dc2626')},uOpacity:{value:0.75},uMouse:{value:new THREE.Vector2(0,0)}};
+    var mat=new THREE.ShaderMaterial({vertexShader:vs,fragmentShader:fs,uniforms:uni,transparent:true,depthWrite:false,blending:THREE.NormalBlending});
+    grp.add(new THREE.Points(geo,mat));
+    var lg=new THREE.Group();grp.add(lg);
     function co(r,rx,ry){var cv=new THREE.EllipseCurve(0,0,r,r,0,2*Math.PI,false,0);var g2=new THREE.BufferGeometry().setFromPoints(cv.getPoints(128));var m2=new THREE.LineBasicMaterial({color:0xdc2626,transparent:true,opacity:0.2});var o=new THREE.Line(g2,m2);o.rotation.x=rx;o.rotation.y=ry;lg.add(o);return o;}
-    var orbs = [co(5.8,Math.PI/2,0), co(5.4,Math.PI/3,Math.PI/6), co(6.3,Math.PI/1.8,Math.PI/4)];
+    var orbs=[co(5.8,Math.PI/2,0),co(5.4,Math.PI/3,Math.PI/6),co(6.3,Math.PI/1.8,Math.PI/4)];
 
     function adj(){
-        if(isMobile()){
-            // 3x bigger on mobile
-            grp.position.set(0, 0.3, -1);
-            grp.scale.set(2.1, 2.1, 2.1);
-        } else {
-            grp.position.set(2, 0, -2);
-            grp.scale.set(1, 1, 1);
-        }
+        if(isMobile()){grp.position.set(0,0.3,-1);grp.scale.set(2.1,2.1,2.1)}
+        else{grp.position.set(1.5,0,-2);grp.scale.set(1,1,1)}
     }
     adj();
 
-    var mx=0, my=0;
-    document.addEventListener('mousemove', function(e){
-        mx=(e.clientX/window.innerWidth)*2-1; my=-(e.clientY/window.innerHeight)*2+1;
-        uni.uMouse.value.x+=(mx-uni.uMouse.value.x)*.05;
-        uni.uMouse.value.y+=(my-uni.uMouse.value.y)*.05;
-    });
-    window.addEventListener('resize', function(){
-        cam.aspect=c.clientWidth/c.clientHeight; cam.updateProjectionMatrix();
-        ren.setSize(c.clientWidth, c.clientHeight); adj(); setupMobileHint();
-    });
+    var mx=0,my=0;
+    document.addEventListener('mousemove',function(e){mx=(e.clientX/window.innerWidth)*2-1;my=-(e.clientY/window.innerHeight)*2+1;uni.uMouse.value.x+=(mx-uni.uMouse.value.x)*.05;uni.uMouse.value.y+=(my-uni.uMouse.value.y)*.05});
+    window.addEventListener('resize',function(){cam.aspect=c.clientWidth/c.clientHeight;cam.updateProjectionMatrix();ren.setSize(c.clientWidth,c.clientHeight);adj();setupMobileHint()});
 
-    var t = 0;
+    var t=0;
     (function anim(){
         requestAnimationFrame(anim);
-        t += 0.02;
-        grp.rotation.y = t*0.04;
-        grp.rotation.z = Math.sin(t*0.08)*0.06;
-        lg.rotation.x = Math.sin(t*0.05)*0.25;
-        orbs.forEach(function(o,i){ o.rotation.z += 0.0015*(i+1); });
-        cam.position.x += (mx*0.5 - cam.position.x)*0.04;
-        cam.position.y += (my*0.5 - cam.position.y)*0.04;
+        t+=0.035;
+        grp.rotation.y=t*0.07;
+        grp.rotation.z=Math.sin(t*0.12)*0.07;
+        lg.rotation.x=Math.sin(t*0.08)*0.3;
+        orbs.forEach(function(o,i){o.rotation.z+=0.003*(i+1)});
+        cam.position.x+=(mx*0.5-cam.position.x)*0.04;
+        cam.position.y+=(my*0.5-cam.position.y)*0.04;
         cam.lookAt(0,0,0);
-        uni.uTime.value = t;
+        uni.uTime.value=t;
 
-        // ── Distortion state machine ──
-        var now = performance.now();
-        if (orbState === 'spike') {
-            // Sharp spike that peaks then transitions to thinking
-            var elapsed = (now - spikeTime) / 1000;
-            if (elapsed < 0.4) {
-                // Rapid ramp up
-                currentDistortion += (3.8 - currentDistortion) * 0.2;
-            } else {
-                // Transition to thinking
-                startThinking();
-            }
-        } else if (orbState === 'thinking') {
-            // Active oscillation while waiting for response
-            currentDistortion = 1.8 + Math.sin(t*3.5)*1.0 + Math.sin(t*6.2)*0.5 + Math.sin(t*1.8)*0.3;
-        } else if (orbState === 'settle') {
-            // Smooth decay back to idle
-            currentDistortion += (baseDistortion - currentDistortion) * 0.025;
-            if (Math.abs(currentDistortion - baseDistortion) < 0.05) {
-                currentDistortion = baseDistortion;
-                orbState = 'idle';
-            }
-        } else {
-            // idle
-            currentDistortion += (baseDistortion - currentDistortion) * 0.03;
+        var now=performance.now();
+        if(orbState==='spike'){
+            var el=(now-spikeTime)/1000;
+            if(el<0.35){currentDistortion+=(4.0-currentDistortion)*0.25}
+            else{startThinking()}
+        }else if(orbState==='thinking'){
+            currentDistortion=2.0+Math.sin(t*4.0)*1.2+Math.sin(t*7.0)*0.6+Math.sin(t*2.2)*0.4;
+        }else if(orbState==='settle'){
+            currentDistortion+=(baseDistortion-currentDistortion)*0.02;
+            if(Math.abs(currentDistortion-baseDistortion)<0.05){currentDistortion=baseDistortion;orbState='idle'}
+        }else{
+            currentDistortion+=(baseDistortion-currentDistortion)*0.03;
         }
+        uni.uDistortion.value=currentDistortion;
 
-        uni.uDistortion.value = currentDistortion;
-
-        if(!isMobile()){
-            var tOp = chatOpen ? 0.7 : 0.55;
-            var cur = parseFloat(c.style.opacity) || 0.55;
-            c.style.opacity = (cur+(tOp-cur)*0.04).toFixed(3);
-        }
-        ren.render(scene, cam);
+        if(!isMobile()){var tOp=chatOpen?0.7:0.55;var cur=parseFloat(c.style.opacity)||0.55;c.style.opacity=(cur+(tOp-cur)*0.04).toFixed(3)}
+        ren.render(scene,cam);
     })();
 
-    c.addEventListener('click', function(){ if(!chatOpen) openChat(); });
+    c.addEventListener('click',function(){if(!chatOpen)openChat()});
 })();
 
-function setupMobileHint(){
-    var mh = document.getElementById('mobile-hint');
-    if(isMobile()){ mh.style.display = chatOpen ? 'none' : 'flex'; }
-    else { mh.style.display = 'none'; }
-}
+function setupMobileHint(){var mh=document.getElementById('mobile-hint');if(isMobile()){mh.style.display=chatOpen?'none':'flex'}else{mh.style.display='none'}}
 setupMobileHint();
 
-// ═══════════ CHAT ═══════════
 (function(){
-    var ov=document.getElementById('chat-overlay'), hint=document.getElementById('arrow-hint'), mhint=document.getElementById('mobile-hint'), cls=document.getElementById('chat-close'), inp=document.getElementById('chat-input'), snd=document.getElementById('chat-send'), msgs=document.getElementById('chat-messages'), limEl=document.getElementById('chat-limit');
-    var MAX=8, qC=0;
-    function upLim(){ var l=MAX-qC; if(l<=3&&l>0) limEl.textContent=l+' questions remaining'; else if(l<=0) limEl.textContent='Limit reached — check the résumé for more'; else limEl.textContent=''; }
-
-    window.openChat = function(){
-        chatOpen=true; ov.classList.add('open');
-        if(hint) hint.classList.add('gone');
-        if(mhint) mhint.classList.add('gone');
-        setTimeout(function(){ inp.focus(); }, 300);
-    };
-    cls.addEventListener('click', function(){
-        chatOpen=false; ov.classList.remove('open');
-        if(hint) hint.classList.remove('gone');
-        if(mhint){ mhint.classList.remove('gone'); setupMobileHint(); }
-        stopThinking();
-    });
+    var ov=document.getElementById('chat-overlay'),hint=document.getElementById('arrow-hint'),mhint=document.getElementById('mobile-hint'),cls=document.getElementById('chat-close'),inp=document.getElementById('chat-input'),snd=document.getElementById('chat-send'),msgs=document.getElementById('chat-messages'),limEl=document.getElementById('chat-limit');
+    var MAX=8,qC=0;
+    function upLim(){var l=MAX-qC;if(l<=3&&l>0)limEl.textContent=l+' questions remaining';else if(l<=0)limEl.textContent='Limit reached — check the résumé for more';else limEl.textContent=''}
+    window.openChat=function(){chatOpen=true;ov.classList.add('open');if(hint)hint.classList.add('gone');if(mhint)mhint.classList.add('gone');setTimeout(function(){inp.focus()},300)};
+    cls.addEventListener('click',function(){chatOpen=false;ov.classList.remove('open');if(hint)hint.classList.remove('gone');if(mhint){mhint.classList.remove('gone');setupMobileHint()}stopThinking()});
 
     var SYS=`You are an AI assistant embedded on Nathan Liu's personal website. Answer ONLY from the info below. Be concise (2-4 sentences). Sound natural and conversational. If unsure, say so.
 
-NATHAN LIU — UC Berkeley, Class of 2027
-Dual Bachelor's: B.S. Chemical Engineering (3.86), B.A. Computer Science (3.92). Cumulative 3.845. Highest Honor.
-
-RESEARCH:
-- Peidong Yang Group, Lawrence Berkeley National Laboratory: ML-driven discovery & optimization of next-gen catalysts for CO2 electrochemical reduction. H-cell electrolysis, EIS, in situ Raman, TEM, SECCM. Upcoming JACS pub.
-- Ali Mesbah Lab: Stochastic optimization & learning-based control.
-- Funded by Kavli Foundation (ENSI Fellow), Bakar BioEnginuity Labs, Berkeley Discovery Hub.
-
-VENTURES:
-- EntroPINN Inc., Co-Founder: VC-backed. PINNs for heat transfer optimization in industrial processes. Partners: AVEVA, Siemens. 70+ engineers interviewed.
-- Free Ventures. AIEB (AI Entrepreneurs at Berkeley).
-
-LEADERSHIP:
-- Vice President, UC Berkeley Tau Beta Pi National Engineering Honor Society (California-Alpha Chapter, 1907).
-- UC Berkeley Campus Director, UN Millennium Fellowship. 4 projects, 50+ volunteers, 6 countries, 750+ hours, 500+ families.
-
-EXPERIENCE:
-- Paradromics: Neural decoding for Connexus BCI. 200+ bps, 20x throughput, 15+ experiments.
-- Industry Co-op (engine exhaust after-treatment R&D): ML emission monitoring, 16,200+ vehicles, -14% NOx (>2,100 tons).
-- CCZF Management VC consultant: sodium-ion battery & liquid hydrogen storage startups. 7-figure investment.
-
-AWARDS: Llama Ventures Top 5 (2026), Astronaut Scholarship Top 8 at Berkeley (2026), YC AI SUS Top 2,500 (2025), Formula Sun Grand Prix 5th + Fastest Lap (2024), VPC Fellowship 1/16 nationwide (2023).
-
+NATHAN LIU — UC Berkeley, Class of 2027. Dual Bachelor's: B.S. Chemical Engineering (3.86), B.A. Computer Science (3.92). Cumulative 3.845. Highest Honor.
+RESEARCH: Peidong Yang Group (LBNL): ML-driven CO2 catalyst discovery, H-cell electrolysis, EIS, Raman, TEM, SECCM. Upcoming JACS pub. Ali Mesbah Lab: stochastic optimization & learning-based control. Funded by Kavli (ENSI Fellow), Bakar, Berkeley Discovery Hub.
+VENTURES: EntroPINN Co-Founder (VC-backed PINNs for heat transfer, AVEVA/Siemens, 70+ engineers). Free Ventures. AIEB.
+LEADERSHIP: VP UC Berkeley Tau Beta Pi (CA-Alpha 1907). UC Berkeley Campus Dir, UN Millennium Fellowship (4 projects, 50+ volunteers, 6 countries, 750+ hrs, 500+ families).
+EXPERIENCE: Paradromics neuroengineer intern (Connexus BCI, 200+ bps, 20x throughput, 15+ experiments). Industry Co-op (ML emission monitoring, 16,200+ vehicles, -14% NOx). CCZF VC consultant (7-figure investment).
+AWARDS: Llama Ventures Top 5 (2026), Astronaut Scholarship Top 8 (2026), YC AI SUS Top 2,500 (2025), Formula Sun 5th+Fastest Lap (2024), VPC Fellowship 1/16 (2023).
 Contact: NathanL2132@berkeley.edu | linkedin.com/in/nathan-sr-liu`;
 
-    var hist=[], loading=false;
-    function addMsg(t,r){ var d=document.createElement('div'); d.className='chat-msg '+r; d.textContent=t; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; return d; }
-
+    var hist=[],loading=false;
+    function addMsg(t,r){var d=document.createElement('div');d.className='chat-msg '+r;d.textContent=t;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
     async function send(){
-        var q = inp.value.trim(); if(!q || loading) return;
-        if(qC >= MAX){ inp.value=''; addMsg("I've hit the question limit for this session. Feel free to check Nathan's résumé or email him directly.",'ai'); return; }
-        inp.value=''; addMsg(q,'user'); hist.push({role:'user',content:q}); qC++; upLim();
-
-        // Spike on send
+        var q=inp.value.trim();if(!q||loading)return;
+        if(qC>=MAX){inp.value='';addMsg("I've hit the question limit. Check Nathan's résumé or email him.",'ai');return}
+        inp.value='';addMsg(q,'user');hist.push({role:'user',content:q});qC++;upLim();
         triggerSpike();
-
-        loading=true; snd.disabled=true;
-        var th=document.createElement('div'); th.className='chat-msg ai'; th.innerHTML='<span class="thinking">Thinking...</span>'; msgs.appendChild(th); msgs.scrollTop=msgs.scrollHeight;
-
+        loading=true;snd.disabled=true;
+        var th=document.createElement('div');th.className='chat-msg ai';th.innerHTML='<span class="thinking">Thinking...</span>';msgs.appendChild(th);msgs.scrollTop=msgs.scrollHeight;
         try{
-            var res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,system:SYS,messages:hist.slice(-8)})});
-            var data = await res.json();
-            var ans = data.content?.map(function(b){return b.text||''}).join('') || "Sorry, I couldn't process that.";
-            th.remove(); addMsg(ans,'ai'); hist.push({role:'assistant',content:ans});
-        } catch(e) { th.remove(); addMsg('Something went wrong. Please try again.','ai'); }
-
-        stopThinking();
-        loading=false; snd.disabled=false;
+            var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,system:SYS,messages:hist.slice(-8)})});
+            var data=await res.json();var ans=data.content?.map(function(b){return b.text||''}).join('')||"Sorry, I couldn't process that.";
+            th.remove();addMsg(ans,'ai');hist.push({role:'assistant',content:ans});
+        }catch(e){th.remove();addMsg('Something went wrong. Please try again.','ai')}
+        stopThinking();loading=false;snd.disabled=false;
     }
-    snd.addEventListener('click', send);
-    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') send(); });
+    snd.addEventListener('click',send);
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter')send()});
 })();
 </script>
 </body>
