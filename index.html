@@ -50,12 +50,12 @@
         .f{animation:fadeUp .9s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
         .d1{animation-delay:.06s}.d2{animation-delay:.14s}.d3{animation-delay:.24s}.d4{animation-delay:.36s}.d5{animation-delay:.48s}
 
-        .page{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;justify-content:center;width:50vw;max-width:600px;padding:2.5rem 2.5rem 2rem}
+        .page{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;justify-content:center;width:50vw;max-width:600px;padding:4.5rem 2.5rem 2rem}
 
-        .hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--border)}
-        .hdr-name{font-family:var(--display);font-size:1.75rem;font-weight:400;letter-spacing:-0.02em}
+        .hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--border)}
+        .hdr-name{font-family:var(--display);font-size:3rem;font-weight:400;letter-spacing:-0.02em;line-height:0.95}
         .hdr-name em{font-style:italic;color:var(--red)}
-        .hdr-links{display:flex;gap:.9rem;align-items:center}
+        .hdr-links{display:flex;gap:.9rem;align-items:center;align-self:flex-end;padding-bottom:.2rem}
         .hdr-links a{font-family:var(--mono);font-size:.5rem;font-weight:300;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-decoration:none;transition:color .15s}
         .hdr-links a:hover{color:var(--fg)}
         .tag{font-family:var(--display);font-size:clamp(1.3rem,2.2vw,1.9rem);font-weight:300;line-height:1.2;letter-spacing:-0.02em;margin-bottom:1.1rem}
@@ -99,10 +99,10 @@
             .chat-messages{padding:3.5rem 1.25rem 1rem}
             .chat-input-row{padding:.75rem 1.25rem 1.5rem}
             .chat-close-btn{top:1rem;right:1rem}
-            .page{width:100%;max-width:100%;height:auto;min-height:auto;padding:1.75rem 1.5rem 2rem;background:var(--bg);position:relative;z-index:3}
-            .hdr{flex-direction:column;gap:.5rem}
-            .hdr-links{flex-wrap:wrap;gap:.7rem}
-            .hdr-name{font-size:1.55rem}
+            .page{width:100%;max-width:100%;height:auto;min-height:auto;padding:2.5rem 1.5rem 2rem;background:var(--bg);position:relative;z-index:3}
+            .hdr{flex-direction:column;align-items:flex-start;gap:.5rem}
+            .hdr-links{flex-wrap:wrap;gap:.7rem;align-self:flex-start;padding-bottom:0}
+            .hdr-name{font-size:2.2rem;line-height:0.95}
             .tag{font-size:1.35rem;margin-bottom:1rem}
             .creds{grid-template-columns:1fr 1fr;gap:.8rem}
             .clist li{font-size:.68rem}
@@ -146,7 +146,7 @@
     <div class="school f d2">UC Berkeley · Chemical Engineering &amp; Computer Science · Class of 2027</div>
     <div class="creds f d3">
         <div><div class="cl">Research</div><ul class="clist"><li><a href="https://nanowires.berkeley.edu/" target="_blank">Peidong Yang Group</a> <span class="r">· ML-driven CO₂ electrochemical reduction</span></li><li><a href="https://www.mesbahlab.com/" target="_blank">Ali Mesbah Lab</a> <span class="r">· Stochastic optimization &amp; learning-based control</span></li><li><a href="#">The Kavli Foundation</a> <span class="r">· ENSI Fellow</span></li><li><a href="#">Bakar BioEnginuity Labs</a></li></ul></div>
-       <div><div class="cl">Ventures</div><ul class="clist"><li><a href="https://www.entropinn.com" target="_blank">EntroPINN</a> <span class="r">· Co-founder</span></li><li><a href="https://www.freeventures.org/" target="_blank">Free Ventures</a> <span class="r">· Fall 2025 Batch</span></li><li><a href="https://www.aientrepreneurs.org/" target="_blank">AI Entrepreneurs at Berkeley</a> <span class="r">· Spring 2026 Batch</span></li></ul></div>
+        <div><div class="cl">Ventures</div><ul class="clist"><li><a href="https://www.entropinn.com" target="_blank">EntroPINN</a> <span class="r">· Co-founder</span></li><li><a href="https://www.freeventures.org/" target="_blank">Free Ventures</a> <span class="r">· Fall 2025 Batch</span></li><li><a href="https://www.aientrepreneurs.org/" target="_blank">AI Entrepreneurs at Berkeley</a> <span class="r">· Spring 2026 Batch</span></li></ul></div>
         <div><div class="cl">Leadership</div><ul class="clist"><li><a href="https://tbp.studentorg.berkeley.edu/" target="_blank">UC Berkeley Tau Beta Pi</a> <span class="r">· Vice President, National Engineering Honor Society (California-Alpha Chapter, 1907)</span></li><li><a href="https://www.millenniumfellows.org/fellow/2025/berkeley/nathan-shangru-liu" target="_blank">UN Millennium Fellowship</a> <span class="r">· UC Berkeley Campus Director</span></li></ul></div>
     </div>
     <div class="f d4">
