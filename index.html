@@ -291,16 +291,7 @@ setupMobileHint();
     window.openChat=function(){chatOpen=true;ov.classList.add('open');if(hint)hint.classList.add('gone');if(mhint)mhint.classList.add('gone');setTimeout(function(){inp.focus()},300)};
     cls.addEventListener('click',function(){chatOpen=false;ov.classList.remove('open');if(hint)hint.classList.remove('gone');if(mhint){mhint.classList.remove('gone');setupMobileHint()}stopThinking()});
  
-    var SYS=`You are an AI assistant embedded on Nathan Liu's personal website. Answer ONLY from the info below. Be concise (2-4 sentences). Sound natural and conversational. If unsure, say so.
- 
-NATHAN LIU — UC Berkeley, Class of 2027. Dual Bachelor's: B.S. Chemical Engineering (3.86), B.A. Computer Science (3.92). Cumulative 3.845. Highest Honor.
-RESEARCH: Peidong Yang Group (LBNL): ML-driven CO2 catalyst discovery, H-cell electrolysis, EIS, Raman, TEM, SECCM. Upcoming JACS pub. Ali Mesbah Lab: stochastic optimization & learning-based control. Funded by Kavli (ENSI Fellow), Bakar, Berkeley Discovery Hub.
-VENTURES: EntroPINN Co-Founder (PINNs for heat transfer, AVEVA/Siemens, 70+ engineers). Free Ventures. AIEB.
-LEADERSHIP: VP UC Berkeley Tau Beta Pi (CA-Alpha 1907). UC Berkeley Campus Dir, UN Millennium Fellowship (4 projects, 50+ volunteers, 6 countries, 750+ hrs, 500+ families).
-EXPERIENCE: Paradromics neuroengineer intern (Connexus BCI, 200+ bps, 20x throughput, 15+ experiments). Industry Co-op (ML emission monitoring, 16,200+ vehicles, -14% NOx). CCZF VC consultant (7-figure investment).
-AWARDS: Llama Ventures Top 5 (2026), Astronaut Scholarship Top 8 (2026), YC AI SUS Top 2,500 (2025), Formula Sun 5th+Fastest Lap (2024), VPC Fellowship 1/16 (2023).
-Contact: NathanL2132@berkeley.edu | linkedin.com/in/nathan-sr-liu`;
- 
+    var WORKER_URL='https://monday.liu-nathan05.workers.dev';
     var hist=[],loading=false;
     function addMsg(t,r){var d=document.createElement('div');d.className='chat-msg '+r;d.textContent=t;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
     async function send(){
@@ -311,7 +302,7 @@ Contact: NathanL2132@berkeley.edu | linkedin.com/in/nathan-sr-liu`;
         loading=true;snd.disabled=true;
         var th=document.createElement('div');th.className='chat-msg ai';th.innerHTML='<span class="thinking">Thinking...</span>';msgs.appendChild(th);msgs.scrollTop=msgs.scrollHeight;
         try{
-            var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,system:SYS,messages:hist.slice(-8)})});
+            var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8)})});
             var data=await res.json();var ans=data.content?.map(function(b){return b.text||''}).join('')||"Sorry, I couldn't process that.";
             th.remove();addMsg(ans,'ai');hist.push({role:'assistant',content:ans});
         }catch(e){th.remove();addMsg('Something went wrong. Please try again.','ai')}
