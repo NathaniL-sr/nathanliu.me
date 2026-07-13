@@ -118,6 +118,21 @@
         .essay-section p{font-size:.82rem;font-weight:300;line-height:1.85;color:var(--fg);margin-bottom:1.4rem;text-align:left}
         .essay-section p:last-child{margin-bottom:0}
         @media(max-width:900px){.essay-section{padding:3rem 1.5rem 3rem;max-width:100%}}
+        .drive-section{position:relative;z-index:1;max-width:640px;padding:5rem 2.5rem 1rem;margin:0}
+        .drive-eyebrow{font-family:var(--mono);font-size:.42rem;font-weight:300;text-transform:uppercase;letter-spacing:.15em;color:var(--light);margin-bottom:.7rem}
+        .drive-title{font-family:var(--display);font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:400;font-style:italic;letter-spacing:-0.02em;line-height:1.2;margin-bottom:.4rem;color:var(--fg)}
+        .drive-title em{font-style:normal;color:var(--red)}
+        .drive-rule{width:40px;height:1px;background:var(--red);margin-bottom:2rem}
+        .drive-lede{font-family:var(--display);font-size:clamp(1.05rem,1.6vw,1.3rem);font-weight:300;font-style:italic;line-height:1.5;color:var(--muted);margin-bottom:1.8rem;padding-left:1rem;border-left:1px solid var(--border)}
+        .drive-section p{font-size:.82rem;font-weight:300;line-height:1.85;color:var(--fg);margin-bottom:1.4rem}
+        .drive-section p:last-child{margin-bottom:0}
+        .drive-section p strong{font-weight:500;color:var(--fg)}
+        .drive-pair{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.6rem}
+        .drive-card{border-top:1px solid var(--border);padding-top:.7rem;transition:border-color .15s}
+        .drive-card:hover{border-color:var(--red)}
+        .drive-card-label{font-family:var(--mono);font-size:.42rem;font-weight:400;text-transform:uppercase;letter-spacing:.15em;color:var(--red);margin-bottom:.4rem}
+        .drive-card p{font-size:.72rem;line-height:1.75;color:var(--muted);margin-bottom:0}
+        @media(max-width:900px){.drive-section{padding:3rem 1.5rem 1rem;max-width:100%}.drive-pair{grid-template-columns:1fr;gap:1.1rem}}
         .mobile-hint{display:none;position:absolute;z-index:16;left:50%;bottom:1.25rem;transform:translateX(-50%);align-items:center;gap:.5rem;pointer-events:none;transition:opacity .4s}
         .mobile-hint.gone{opacity:0}
         .mobile-hint-text{font-family:var(--display);font-style:italic;font-size:.85rem;color:var(--muted);white-space:nowrap}
@@ -148,7 +163,7 @@
  
 <div class="page">
     <div class="hdr f d1"><div class="hdr-name">Nathan <em>Liu</em></div><div class="hdr-links"><a href="mailto:NathanL2132@berkeley.edu">Email</a><a href="https://www.linkedin.com/in/nathan-sr-liu" target="_blank">LinkedIn</a><a href="" target="_blank">GitHub</a></div></div>
-    <div class="tag f d2">Engineer, researcher, founder.<br>AI for physical systems &amp; <em>scientific discovery.</em></div>
+    <div class="tag f d2">Engineer, researcher, founder.<br><em>AI</em> for physical systems &amp; scientific discovery.</div>
     <div class="school f d2">UC Berkeley · B.S. Chemical Engineering &amp; B.A. Computer Science · Class of 2027</div>
     <div class="creds f d3">
         <div><div class="cl">Research</div><ul class="clist"><li><a href="https://nanowires.berkeley.edu/" target="_blank">Peidong Yang Group</a> <span class="r">· ML-driven CO₂ electrochemical reduction</span></li><li><a href="https://www.mesbahlab.com/" target="_blank">Ali Mesbah Lab</a> <span class="r">· Stochastic optimization &amp; learning-based control</span></li><li><a href="#">The Kavli Foundation</a> <span class="r">· ENSI Fellow</span></li><li><a href="#">Bakar BioEnginuity Labs</a></li></ul></div>
@@ -168,6 +183,23 @@
     <div class="ft f d5">
         <div class="ft-links"><a href="mailto:NathanL2132@berkeley.edu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Email</a><a href="https://www.linkedin.com/in/nathan-sr-liu" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a><a href="" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>GitHub</a></div>
         <div class="ft-r"><div class="pdot"></div><div class="ft-s">Berkeley, CA · Open to collaborate</div></div>
+    </div>
+</div>
+
+<div class="drive-section">
+    <div class="drive-title">What Drives Me</div>
+    <div class="drive-rule"></div>
+    <div class="drive-lede">The world is larger than what we currently reach — and that gap is partly an engineering problem.</div>
+
+    <div class="drive-pair">
+        <div class="drive-card">
+            <div class="drive-card-label">Aspirationally</div>
+            <p>Most of what is possible remains unbuilt because we have not yet found the right way to search the space. I would like to spend my life on it.</p>
+        </div>
+        <div class="drive-card">
+            <div class="drive-card-label">Personally</div>
+            <p>Entropy. Time may not be fundamental, but from where I stand it runs one way. That unsettles me in ways I've learned to use.</p>
+        </div>
     </div>
 </div>
 
